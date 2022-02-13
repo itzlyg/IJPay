@@ -285,14 +285,14 @@ public class QqPayApi {
 
 
     public static String doPost(String url, Map<String, String> params) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params));
+        return HttpKit.post(url, WxPayKit.toXml(params));
     }
 
     public static String doPost(String url, Map<String, String> params, String certPath, String certPass) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certPath, certPass);
+        return HttpKit.post(url, WxPayKit.toXml(params), certPath, certPass);
     }
 
     public static String doPost(String url, Map<String, String> params, InputStream certFile, String certPass) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certFile, certPass);
+        return HttpKit.post(url, WxPayKit.toXml(params), certFile, certPass);
     }
 }

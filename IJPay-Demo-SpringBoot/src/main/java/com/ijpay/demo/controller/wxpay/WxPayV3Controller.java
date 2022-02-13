@@ -1,26 +1,26 @@
 package com.ijpay.demo.controller.wxpay;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.FileWriter;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.http.ContentType;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.enums.RequestMethod;
 import com.ijpay.core.kit.AesUtil;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.PayKit;
 import com.ijpay.core.kit.WxPayKit;
-import com.ijpay.core.utils.DateTimeZoneUtil;
+import com.ijpay.core.utils.PayDateUtil;
+import com.ijpay.core.utils.PayJsonUtil;
 import com.ijpay.demo.entity.WxPayV3Bean;
 import com.ijpay.wxpay.WxPayApi;
 import com.ijpay.wxpay.enums.WxApiType;
 import com.ijpay.wxpay.enums.WxDomain;
-import com.ijpay.wxpay.model.v3.*;
+import com.ijpay.wxpay.model.v3.Amount;
+import com.ijpay.wxpay.model.v3.Payer;
+import com.ijpay.wxpay.model.v3.RefundAmount;
+import com.ijpay.wxpay.model.v3.RefundGoodsDetail;
+import com.ijpay.wxpay.model.v3.RefundModel;
+import com.ijpay.wxpay.model.v3.UnifiedOrderModel;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -33,10 +33,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
@@ -69,8 +74,8 @@ public class WxPayV3Controller {
     public String index() {
         log.info(wxPayV3Bean.toString());
         try {
-            String absolutePath = PayKit.getAbsolutePath("classpath:/dev/apiclient_cert.p12");
-            log.info("absolutePath:{}", absolutePath);
+//            String absolutePath = PayKit.getAbsolutePath("classpath:/dev/apiclient_cert.p12");
+//            log.info("absolutePath:{}", absolutePath);
         } catch (Exception e) {
             log.error("文件不存在", e);
         }
@@ -90,9 +95,9 @@ public class WxPayV3Controller {
     }
 
     private String getSerialNumber() {
-        if (StrUtil.isEmpty(serialNo)) {
+        if (StringUtils.isEmpty(serialNo)) {
             // 获取证书序列号
-            X509Certificate certificate = PayKit.getCertificate(FileUtil.getInputStream(wxPayV3Bean.getCertPath()));
+            X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getCertPath()));
             serialNo = certificate.getSerialNumber().toString(16).toUpperCase();
 
 //            System.out.println("输出证书信息:\n" + certificate.toString());
@@ -110,10 +115,20 @@ public class WxPayV3Controller {
         return serialNo;
     }
 
+	private InputStream openInputStream(String path){
+		File file = new File(path);
+		try {
+			return FileUtils.openInputStream(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
     private String getPlatSerialNumber() {
-        if (StrUtil.isEmpty(platSerialNo)) {
+        if (StringUtils.isEmpty(platSerialNo)) {
             // 获取平台证书序列号
-            X509Certificate certificate = PayKit.getCertificate(FileUtil.getInputStream(wxPayV3Bean.getPlatformCertPath()));
+            X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getPlatformCertPath()));
             platSerialNo = certificate.getSerialNumber().toString(16).toUpperCase();
         }
         System.out.println("platSerialNo:" + platSerialNo);
@@ -131,8 +146,7 @@ public class WxPayV3Controller {
                     cipherText
             );
             // 保存证书
-            FileWriter writer = new FileWriter(certPath);
-            writer.write(publicKey);
+			FileUtils.write(new File(certPath), publicKey, Charset.defaultCharset());
             // 获取平台证书序列号
             X509Certificate certificate = PayKit.getCertificate(new ByteArrayInputStream(publicKey.getBytes()));
             return certificate.getSerialNumber().toString(16).toUpperCase();
@@ -186,15 +200,13 @@ public class WxPayV3Controller {
             log.info("body: {}", body);
             int isOk = 200;
             if (status == isOk) {
-                JSONObject jsonObject = JSONUtil.parseObj(body);
-                JSONArray dataArray = jsonObject.getJSONArray("data");
+				JsonNode nodes = PayJsonUtil.toNode(body, "data");
+				JsonNode node = nodes.get(0).get("encrypt_certificate");
                 // 默认认为只有一个平台证书
-                JSONObject encryptObject = dataArray.getJSONObject(0);
-                JSONObject encryptCertificate = encryptObject.getJSONObject("encrypt_certificate");
-                String associatedData = encryptCertificate.getStr("associated_data");
-                String cipherText = encryptCertificate.getStr("ciphertext");
-                String nonce = encryptCertificate.getStr("nonce");
-                String serialNo = encryptObject.getStr("serial_no");
+                String associatedData = node.get("associated_data").asText();
+                String cipherText = node.get("ciphertext").asText();
+                String nonce = node.get("nonce").asText();
+                String serialNo = node.get("serial_no").asText();
                 final String platSerialNo = savePlatformCert(associatedData, nonce, cipherText, wxPayV3Bean.getPlatformCertPath());
                 log.info("平台证书序列号: {} serialNo: {}", platSerialNo, serialNo);
             }
@@ -212,18 +224,19 @@ public class WxPayV3Controller {
     @ResponseBody
     public String nativePay() {
         try {
-            String timeExpire = DateTimeZoneUtil.dateToTimeZone(System.currentTimeMillis() + 1000 * 60 * 3);
-            UnifiedOrderModel unifiedOrderModel = new UnifiedOrderModel()
-                    .setAppid(wxPayV3Bean.getAppId())
-                    .setMchid(wxPayV3Bean.getMchId())
-                    .setDescription("IJPay 让支付触手可及")
-                    .setOut_trade_no(PayKit.generateStr())
-                    .setTime_expire(timeExpire)
-                    .setAttach("微信系开发脚手架 https://gitee.com/javen205/TNWX")
-                    .setNotify_url(wxPayV3Bean.getDomain().concat("/v3/payNotify"))
-                    .setAmount(new Amount().setTotal(1));
+            String timeExpire = PayDateUtil.addSecondsXxx(60 * 3);
+            UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setAppid(wxPayV3Bean.getAppId());
+			model.setMchid(wxPayV3Bean.getMchId());
+			model.setDescription("IJPay 让支付触手可及");
+			model.setOut_trade_no(PayKit.generateStr());
+			model.setTime_expire(timeExpire);
+			model.setAttach("微信系开发脚手架 https://gitee.com/javen205/TNWX");
+			model.setNotify_url(wxPayV3Bean.getDomain().concat("/v3/payNotify"));
+			model.setAmount(new Amount(1));
 
-            log.info("统一下单参数 {}", JSONUtil.toJsonStr(unifiedOrderModel));
+			String json = PayJsonUtil.toJson(model);
+            log.info("统一下单参数 {}", json);
             IJPayHttpResponse response = WxPayApi.v3(
                     RequestMethod.POST,
                     WxDomain.CHINA.toString(),
@@ -232,7 +245,7 @@ public class WxPayV3Controller {
                     getSerialNumber(),
                     null,
                     wxPayV3Bean.getKeyPath(),
-                    JSONUtil.toJsonStr(unifiedOrderModel)
+				json
             );
             log.info("统一下单响应 {}", response);
             // 根据证书序列号查询对应的证书来验证签名结果
@@ -249,19 +262,19 @@ public class WxPayV3Controller {
     @ResponseBody
     public String jsApiPay(@RequestParam(value = "openId", required = false, defaultValue = "o-_-itxuXeGW3O1cxJ7FXNmq8Wf8") String openId) {
         try {
-            String timeExpire = DateTimeZoneUtil.dateToTimeZone(System.currentTimeMillis() + 1000 * 60 * 3);
-            UnifiedOrderModel unifiedOrderModel = new UnifiedOrderModel()
-                    .setAppid(wxPayV3Bean.getAppId())
-                    .setMchid(wxPayV3Bean.getMchId())
-                    .setDescription("IJPay 让支付触手可及")
-                    .setOut_trade_no(PayKit.generateStr())
-                    .setTime_expire(timeExpire)
-                    .setAttach("微信系开发脚手架 https://gitee.com/javen205/TNWX")
-                    .setNotify_url(wxPayV3Bean.getDomain().concat("/v3/payNotify"))
-                    .setAmount(new Amount().setTotal(1))
-                    .setPayer(new Payer().setOpenid(openId));
-
-            log.info("统一下单参数 {}", JSONUtil.toJsonStr(unifiedOrderModel));
+            String timeExpire = PayDateUtil.addSecondsXxx(60 * 3);
+            UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setAppid(wxPayV3Bean.getAppId());
+			model.setMchid(wxPayV3Bean.getMchId());
+			model.setDescription("IJPay 让支付触手可及");
+			model.setOut_trade_no(PayKit.generateStr());
+			model.setTime_expire(timeExpire);
+			model.setAttach("微信系开发脚手架 https://gitee.com/javen205/TNWX");
+			model.setNotify_url(wxPayV3Bean.getDomain().concat("/v3/payNotify"));
+			model.setAmount(new Amount(1));
+			model.setPayer(new Payer(openId));
+			String json = PayJsonUtil.toJson(model);
+            log.info("统一下单参数 {}", json);
             IJPayHttpResponse response = WxPayApi.v3(
                     RequestMethod.POST,
                     WxDomain.CHINA.toString(),
@@ -270,7 +283,7 @@ public class WxPayV3Controller {
                     getSerialNumber(),
                     null,
                     wxPayV3Bean.getKeyPath(),
-                    JSONUtil.toJsonStr(unifiedOrderModel)
+					json
             );
             log.info("统一下单响应 {}", response);
 
@@ -280,14 +293,13 @@ public class WxPayV3Controller {
                 log.info("verifySignature: {}", verifySignature);
                 if (verifySignature) {
                     String body = response.getBody();
-                    JSONObject jsonObject = JSONUtil.parseObj(body);
-                    String prepayId = jsonObject.getStr("prepay_id");
+                    String prepayId = PayJsonUtil.key2Val(body, "prepay_id");
                     Map<String, String> map = WxPayKit.jsApiCreateSign(wxPayV3Bean.getAppId(), prepayId, wxPayV3Bean.getKeyPath());
                     log.info("唤起支付参数:{}", map);
-                    return JSONUtil.toJsonStr(map);
+                    return PayJsonUtil.toJson(map);
                 }
             }
-            return JSONUtil.toJsonStr(response);
+            return PayJsonUtil.toJson(response);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -310,7 +322,7 @@ public class WxPayV3Controller {
                     getSerialNumber(),
                     null,
                     wxPayV3Bean.getKeyPath(),
-                    JSONUtil.toJsonStr(params)
+				PayJsonUtil.toJson(params)
             );
             // 根据证书序列号查询对应的证书来验证签名结果
             boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
@@ -343,8 +355,7 @@ public class WxPayV3Controller {
                     wxPayV3Bean.getKeyPath(),
                     params
             );
-            System.out.println(result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -356,7 +367,7 @@ public class WxPayV3Controller {
     public String v3Delete() {
         // 创建/查询/更新/删除投诉通知回调
         try {
-            HashMap<String, String> hashMap = new HashMap<>(12);
+            HashMap<String, String> hashMap = new HashMap<>();
             hashMap.put("url", "https://qq.com");
             IJPayHttpResponse result = WxPayApi.v3(
                     RequestMethod.POST,
@@ -366,7 +377,7 @@ public class WxPayV3Controller {
                     getSerialNumber(),
                     null,
                     wxPayV3Bean.getKeyPath(),
-                    JSONUtil.toJsonStr(hashMap)
+				PayJsonUtil.toJson(hashMap)
             );
             System.out.println(result);
 
@@ -384,51 +395,13 @@ public class WxPayV3Controller {
             boolean verifySignature = WxPayKit.verifySignature(result, wxPayV3Bean.getPlatformCertPath());
             System.out.println("verifySignature:" + verifySignature);
             // 如果返回的为 204 表示删除成功
-            System.out.println(result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
         }
     }
 
-    @RequestMapping("/upload")
-    @ResponseBody
-    public String v3Upload() {
-        // v3 接口上传文件
-        try {
-            String filePath = "/Users/Javen/Documents/pic/cat.png";
-
-            File file = FileUtil.newFile(filePath);
-            String sha256 = SecureUtil.sha256(file);
-
-            HashMap<Object, Object> map = new HashMap<>();
-            map.put("filename", file.getName());
-            map.put("sha256", sha256);
-            String body = JSONUtil.toJsonStr(map);
-
-            System.out.println(body);
-
-            IJPayHttpResponse result = WxPayApi.v3(
-                    WxDomain.CHINA.toString(),
-                    WxApiType.MERCHANT_UPLOAD_MEDIA.toString(),
-                    wxPayV3Bean.getMchId(),
-                    getSerialNumber(),
-                    null,
-                    wxPayV3Bean.getKeyPath(),
-                    body,
-                    file
-            );
-            // 根据证书序列号查询对应的证书来验证签名结果
-            boolean verifySignature = WxPayKit.verifySignature(result, wxPayV3Bean.getPlatformCertPath());
-            System.out.println("verifySignature:" + verifySignature);
-            System.out.println(result);
-            return JSONUtil.toJsonStr(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
-    }
 
     @RequestMapping("/post")
     @ResponseBody
@@ -447,8 +420,7 @@ public class WxPayV3Controller {
                     wxPayV3Bean.getKeyPath(),
                     ""
             );
-            System.out.println(result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -473,7 +445,7 @@ public class WxPayV3Controller {
                     body
             );
             System.out.println(result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -485,7 +457,7 @@ public class WxPayV3Controller {
     public String cipher() {
         try {
             // 敏感信息加密
-            X509Certificate certificate = PayKit.getCertificate(FileUtil.getInputStream(wxPayV3Bean.getPlatformCertPath()));
+            X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getPlatformCertPath()));
             String encrypt = PayKit.rsaEncryptOAEP("IJPay", certificate);
             System.out.println(encrypt);
             // 敏感信息解密
@@ -510,13 +482,10 @@ public class WxPayV3Controller {
     @ResponseBody
     public String tradeBill(@RequestParam(value = "billDate", required = false) String billDate) {
         try {
-            if (StrUtil.isEmpty(billDate)) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.DATE, -1);
-                billDate = DateUtil.format(calendar.getTime(), "YYYY-MM-dd");
+            if (StringUtils.isEmpty(billDate)) {
+                billDate = PayDateUtil.addDate(-1, PayDateUtil.DATE_PATTERN);
             }
-            Map<String, String> params = new HashMap<>(12);
+            Map<String, String> params = new HashMap<>();
             params.put("bill_date", billDate);
             params.put("bill_type", "ALL");
             params.put("tar_type", "GZIP");
@@ -535,7 +504,7 @@ public class WxPayV3Controller {
             boolean verifySignature = WxPayKit.verifySignature(result, wxPayV3Bean.getPlatformCertPath());
             log.info("verifySignature: {}", verifySignature);
             log.info("result:{}", result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -552,13 +521,10 @@ public class WxPayV3Controller {
     @ResponseBody
     public String fundFlowBill(@RequestParam(value = "billDate", required = false) String billDate) {
         try {
-            if (StrUtil.isEmpty(billDate)) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.DATE, -1);
-                billDate = DateUtil.format(calendar.getTime(), "YYYY-MM-dd");
+            if (StringUtils.isEmpty(billDate)) {
+                billDate = PayDateUtil.addDate(-1, PayDateUtil.DATE_PATTERN);
             }
-            Map<String, String> params = new HashMap<>(12);
+            Map<String, String> params = new HashMap<>();
             params.put("bill_date", billDate);
             params.put("account_type", "BASIC");
 
@@ -576,7 +542,7 @@ public class WxPayV3Controller {
             boolean verifySignature = WxPayKit.verifySignature(result, wxPayV3Bean.getPlatformCertPath());
             log.info("verifySignature: {}", verifySignature);
             log.info("result:{}", result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -589,9 +555,9 @@ public class WxPayV3Controller {
                                @RequestParam(value = "tarType", required = false) String tarType) {
         try {
 
-            Map<String, String> params = new HashMap<>(12);
+            Map<String, String> params = new HashMap<>();
             params.put("token", token);
-            if (StrUtil.isNotEmpty(tarType)) {
+            if (StringUtils.isNotEmpty(tarType)) {
                 params.put("tartype", tarType);
             }
 
@@ -606,7 +572,7 @@ public class WxPayV3Controller {
                     params
             );
             log.info("result:{}", result);
-            return JSONUtil.toJsonStr(result);
+            return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -622,28 +588,35 @@ public class WxPayV3Controller {
             log.info("商户退款单号: {}", outRefundNo);
 
             List<RefundGoodsDetail> list = new ArrayList<>();
-            RefundGoodsDetail refundGoodsDetail = new RefundGoodsDetail()
-                    .setMerchant_goods_id("123")
-                    .setGoods_name("IJPay 测试")
-                    .setUnit_price(1)
-                    .setRefund_amount(1)
-                    .setRefund_quantity(1);
-            list.add(refundGoodsDetail);
+            RefundGoodsDetail detail = new RefundGoodsDetail();
+			detail.setMerchant_goods_id("123");
+			detail.setGoods_name("IJPay 测试");
+			detail.setUnit_price(1);
+			detail.setRefund_amount(1);
+			detail.setRefund_quantity(1);
+            list.add(detail);
 
-            RefundModel refundModel = new RefundModel()
-                    .setOut_refund_no(outRefundNo)
-                    .setReason("IJPay 测试退款")
-                    .setNotify_url(wxPayV3Bean.getDomain().concat("/v3/refundNotify"))
-                    .setAmount(new RefundAmount().setRefund(1).setTotal(1).setCurrency("CNY"))
-                    .setGoods_detail(list);
+            RefundModel model = new RefundModel();
+			model.setOut_refund_no(outRefundNo);
+			model.setReason("IJPay 测试退款");
+			model.setNotify_url(wxPayV3Bean.getDomain().concat("/v3/refundNotify"));
 
-            if (StrUtil.isNotEmpty(transactionId)) {
-                refundModel.setTransaction_id(transactionId);
+			RefundAmount refund = new RefundAmount();
+			refund.setRefund(1);
+			refund.setTotal(1);
+			refund.setCurrency("CNY");
+
+			model.setAmount(refund);
+			model.setGoods_detail(list);
+
+            if (StringUtils.isNotEmpty(transactionId)) {
+				model.setTransaction_id(transactionId);
             }
-            if (StrUtil.isNotEmpty(outTradeNo)) {
-                refundModel.setOut_trade_no(outTradeNo);
+            if (StringUtils.isNotEmpty(outTradeNo)) {
+				model.setOut_trade_no(outTradeNo);
             }
-            log.info("退款参数 {}", JSONUtil.toJsonStr(refundModel));
+			String json = PayJsonUtil.toJson(model);
+            log.info("退款参数 {}", json);
             IJPayHttpResponse response = WxPayApi.v3(
                     RequestMethod.POST,
                     WxDomain.CHINA.toString(),
@@ -652,7 +625,7 @@ public class WxPayV3Controller {
                     getSerialNumber(),
                     null,
                     wxPayV3Bean.getKeyPath(),
-                    JSONUtil.toJsonStr(refundModel)
+				json
             );
             // 根据证书序列号查询对应的证书来验证签名结果
             boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
@@ -672,7 +645,7 @@ public class WxPayV3Controller {
     @RequestMapping(value = "/payNotify", method = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
     @ResponseBody
     public void payNotify(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, String> map = new HashMap<>(12);
+        Map<String, String> map = new HashMap<>();
         try {
             String timestamp = request.getHeader("Wechatpay-Timestamp");
             String nonce = request.getHeader("Wechatpay-Nonce");
@@ -689,7 +662,7 @@ public class WxPayV3Controller {
 
             log.info("支付通知明文 {}", plainText);
 
-            if (StrUtil.isNotEmpty(plainText)) {
+            if (StringUtils.isNotEmpty(plainText)) {
                 response.setStatus(200);
                 map.put("code", "SUCCESS");
                 map.put("message", "SUCCESS");
@@ -698,8 +671,8 @@ public class WxPayV3Controller {
                 map.put("code", "ERROR");
                 map.put("message", "签名错误");
             }
-            response.setHeader("Content-type", ContentType.JSON.toString());
-            response.getOutputStream().write(JSONUtil.toJsonStr(map).getBytes(StandardCharsets.UTF_8));
+            response.setHeader("Content-type", "application/json");
+            response.getOutputStream().write(PayJsonUtil.toJson(map).getBytes(StandardCharsets.UTF_8));
             response.flushBuffer();
         } catch (Exception e) {
             e.printStackTrace();

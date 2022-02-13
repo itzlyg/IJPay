@@ -1,22 +1,30 @@
 package com.ijpay.demo.controller.jdpay;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.XmlUtil;
+import com.ijpay.core.kit.CypherKit;
+import com.ijpay.core.kit.WxPayKit;
+import com.ijpay.core.utils.PayDateUtil;
 import com.ijpay.demo.entity.JdPayBean;
 import com.ijpay.demo.vo.AjaxResult;
 import com.ijpay.jdpay.JdPayApi;
-import com.ijpay.jdpay.model.*;
 import com.ijpay.jdpay.kit.JdPayKit;
+import com.ijpay.jdpay.model.CustomerPayModel;
+import com.ijpay.jdpay.model.FkmModel;
+import com.ijpay.jdpay.model.QueryBaiTiaoFqModel;
+import com.ijpay.jdpay.model.QueryOrderModel;
+import com.ijpay.jdpay.model.RefundModel;
+import com.ijpay.jdpay.model.UniOrderModel;
+import com.ijpay.jdpay.model.UserRelationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -62,21 +70,23 @@ public class JdPayController {
     @RequestMapping(value = "/appPay", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public AjaxResult appPay() {
-        String reqXml = UniOrderModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(System.currentTimeMillis() + "")
-                .tradeName("IJPay 让支付触手可及")
-                .tradeDesc("https://gitee.com/javen205/IJPay")
-                .tradeTime(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
-                .amount("1")
-                .orderType("1")
-                .currency("CNY")
-                .note("备注")
-                .notifyUrl("http://jdpaydemo.jd.com/asynNotify.htm")
-                .tradeType("GEN")
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		UniOrderModel model = new UniOrderModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(System.currentTimeMillis() + "");
+		model.setTradeName("IJPay 让支付触手可及");
+		model.setTradeDesc("https://gitee.com/javen205/IJPay");
+
+		model.setTradeTime(PayDateUtil.formatLocalDateTime(PayDateUtil.ALL_NON_PATTERN));
+		model.setAmount("1");
+		model.setOrderType("1");
+		model.setCurrency("CNY");
+		model.setNote("备注");
+
+		model.setNotifyUrl("http://jdpaydemo.jd.com/asynNotify.htm");
+		model.setTradeType("GEN");
+
+        String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
 
         // 执行请求
         String resultData = JdPayApi.uniOrder(reqXml);
@@ -98,18 +108,18 @@ public class JdPayController {
         log.info("decrypt>" + decrypt);
 
         // 将 xml 转化为 map
-        Map<String, Object> toMap = XmlUtil.xmlToMap(decrypt);
+        Map<String, String> toMap = WxPayKit.xmlToMap(decrypt);
 
         log.info("result toMap>" + toMap);
 
 
-        String orderId = (String) toMap.get("orderId");
+        String orderId = toMap.get("orderId");
 
         StringBuilder sb = new StringBuilder();
         sb.append("merchant=").append(jdPayBean.getMchId());
         sb.append("&orderId=").append(orderId);
         sb.append("&key=").append("test");
-        String sign = JdPayKit.md5LowerCase(sb.toString());
+        String sign = CypherKit.md5(sb.toString()).toLowerCase();
 
         return new AjaxResult().success(new AppParams(orderId, jdPayBean.getMchId(), "123456789",
                 sign, "123456789"));
@@ -125,23 +135,24 @@ public class JdPayController {
     public ModelAndView saveOrder(@RequestParam("payType") String payType) {
 
         ModelAndView mv = new ModelAndView();
+		UniOrderModel model = new UniOrderModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(System.currentTimeMillis() + "");
+		model.setTradeName("IJPay");
+		model.setTradeDesc("IJPay 让支付触手可及");
 
-        Map<String, String> map = SaveOrderModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(System.currentTimeMillis()+"")
-                .tradeName("IJPay")
-                .tradeDesc("IJPay 让支付触手可及")
-                .tradeTime(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
-                .amount("10000")
-                .orderType("0")
-                .currency("CNY")
-                .note("IJPay 了解一下")
-                .callbackUrl("https://jdpay.com")
-                .notifyUrl("https://jdpay.com")
-                .userId("IJPay001")
-                .build()
-                .createSign(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey());
+		model.setTradeTime(PayDateUtil.formatLocalDateTime(PayDateUtil.ALL_NON_PATTERN));
+		model.setAmount("10000");
+		model.setOrderType("0");
+		model.setCurrency("CNY");
+		model.setNote("IJPay 了解一下");
+
+		model.setCallbackUrl("https://jdpay.com");
+		model.setNotifyUrl("https://jdpay.com");
+		model.setUserId("IJPay001");
+
+        Map<String, String> map = model.createSign(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey());
 
         mv.addObject("map", map);
         mv.addObject("payUrl", payType.equals("pc") ? JdPayApi.PC_SAVE_ORDER_URL : JdPayApi.H5_SAVE_ORDER_URL);
@@ -156,21 +167,21 @@ public class JdPayController {
     public ModelAndView customerPay() {
 
         ModelAndView mv = new ModelAndView();
+		CustomerPayModel model = new CustomerPayModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(System.currentTimeMillis() + "");
+		model.setTradeName("IJPay");
+		model.setTradeDesc("IJPay 让支付触手可及");
 
-        Map<String, String> map = CustomerPayModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(System.currentTimeMillis()+"")
-                .tradeName("IJPay")
-                .tradeDesc("IJPay 让支付触手可及")
-                .tradeTime(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
-//                .amount("1000")
-                .orderType("0")
-                .currency("CNY")
-                .note("IJPay 了解一下")
-                .notifyUrl("https://jdpay.com")
-                .build()
-                .createSign(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey());
+		model.setTradeTime(PayDateUtil.formatLocalDateTime(PayDateUtil.ALL_NON_PATTERN));
+		model.setOrderType("0");
+		model.setCurrency("CNY");
+		model.setNote("IJPay 了解一下");
+		model.setNotifyUrl("https://jdpay.com");
+
+
+        Map<String, String> map = model.createSign(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey());
 
         mv.addObject("map", map);
         mv.addObject("payUrl", JdPayApi.CUSTOMER_PAY_URL);
@@ -183,14 +194,13 @@ public class JdPayController {
     public AjaxResult queryOrder(@RequestParam("tradeType") String tradeType,
                                  @RequestParam("oTradeNum") String oTradeNum,
                                  @RequestParam("tradeNum") String tradeNum) {
-        String reqXml = QueryOrderModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(tradeNum)
-                .tradeType(tradeType)
-                .oTradeNum(oTradeNum)
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		QueryOrderModel model = new QueryOrderModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(tradeNum);
+		model.setTradeType(tradeType);
+		model.setoTradeNum(oTradeNum);
+        String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
         String queryResult = JdPayApi.queryOrder(reqXml);
         log.info("queryResult:" + queryResult);
 
@@ -215,21 +225,22 @@ public class JdPayController {
     @ResponseBody
     public AjaxResult fkmPay(@RequestParam("token") String token,
                              @RequestParam("amount") String amount) {
-        String reqXml = FkmModel.builder()
-                .token(token)
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .device("IJPay Dev")
-                .tradeNum(System.currentTimeMillis()+"")
-                .tradeName("IJPay 刷卡支付")
-                .tradeDesc("IJPay 了解一下")
-                .tradeTime(DateUtil.format(new Date(),"yyyyMMddHHmmss"))
-                .amount(amount)
-                .currency("CNY")
-                .note("备注")
-                .notifyUrl("https://gitee.com/javen205/IJPay")
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		FkmModel model = new FkmModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(System.currentTimeMillis() + "");
+		model.setTradeName("IJPay");
+		model.setTradeDesc("IJPay 让支付触手可及");
+
+		model.setTradeTime(PayDateUtil.formatLocalDateTime(PayDateUtil.ALL_NON_PATTERN));
+		model.setAmount(amount);
+		model.setCurrency("CNY");
+		model.setNote("备注");
+		model.setNotifyUrl("https://gitee.com/javen205/IJPay");
+
+		model.setToken(token);
+
+        String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
         String queryResult = JdPayApi.fkmPay(reqXml);
         log.info("queryResult:" + queryResult);
 
@@ -254,12 +265,12 @@ public class JdPayController {
     @ResponseBody
     public AjaxResult userRelation(@RequestParam("userId") String userId,
                                    @RequestParam("type") String type) {
-        String reqXml = UserRelationModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .userId(userId)
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		UserRelationModel model = new UserRelationModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setUserId(userId);
+
+        String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
 
         String result = null;
 
@@ -282,11 +293,7 @@ public class JdPayController {
         }
         // 解密并验证签名
         String decrypt = JdPayKit.decrypt(jdPayBean.getRsaPublicKey(), jdPayBean.getDesKey(), encrypt);
-
         log.info("decrypt>" + decrypt);
-
-        Map<String, Object> toMap = XmlUtil.xmlToMap(decrypt);
-        System.out.println(toMap);
         return new AjaxResult().success(decrypt);
     }
 
@@ -295,17 +302,16 @@ public class JdPayController {
     public AjaxResult refund(@RequestParam("amount") String amount,
                              @RequestParam("oTradeNum") String oTradeNum,
                              @RequestParam("tradeNum") String tradeNum) {
+		RefundModel model = new RefundModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(tradeNum);
+		model.setoTradeNum(oTradeNum);
+		model.setAmount(amount);
 
-        System.out.println(Base64.encode(FileUtil.readBytes(jdPayBean.getCertPath())));
-        String reqXml = RefundModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(tradeNum)
-                .oTradeNum(oTradeNum)
-                .amount(amount)
-                .currency("CNY")
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		model.setCurrency("CNY");
+
+        String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
         String queryResult = JdPayApi.refund(reqXml);
         log.info("queryResult:" + queryResult);
 
@@ -330,13 +336,14 @@ public class JdPayController {
     @RequestMapping(value = "/queryBaiTiaoFq", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public AjaxResult queryBaiTiaoFq(@RequestParam("amount") String amount) {
-        String reqXml = QueryBaiTiaoFqModel.builder()
-                .version("V2.0")
-                .merchant(jdPayBean.getMchId())
-                .tradeNum(System.currentTimeMillis() + "")
-                .amount(amount)
-                .build()
-                .genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
+		QueryBaiTiaoFqModel model = new QueryBaiTiaoFqModel();
+		model.setVersion("V2.0");
+		model.setMerchant(jdPayBean.getMchId());
+		model.setTradeNum(System.currentTimeMillis() + "");
+		model.setAmount(amount);
+
+
+		String reqXml = model.genReqXml(jdPayBean.getRsaPrivateKey(), jdPayBean.getDesKey(), "V2.0", jdPayBean.getMchId());
 
         String baiTiaoResult = JdPayApi.queryBaiTiaoFq(reqXml);
 
@@ -353,11 +360,7 @@ public class JdPayController {
         }
         // 解密并验证签名
         String decrypt = JdPayKit.decrypt(jdPayBean.getRsaPublicKey(), jdPayBean.getDesKey(), encrypt);
-
         log.info("decrypt>" + decrypt);
-
-        Map<String, Object> toMap = XmlUtil.xmlToMap(decrypt);
-        System.out.println(toMap);
         return new AjaxResult().success(decrypt);
     }
 }

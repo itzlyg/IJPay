@@ -1,7 +1,7 @@
 
 package com.ijpay.unionpay;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class UnionPayApiConfigKit {
     }
 
     public static UnionPayApiConfig setThreadLocalApiConfig(UnionPayApiConfig UnionPayApiConfig) {
-        if (StrUtil.isNotEmpty(UnionPayApiConfig.getMchId())) {
+        if (StringUtils.isNotEmpty(UnionPayApiConfig.getMchId())) {
             setThreadLocalMchId(UnionPayApiConfig.getMchId());
         }
         return putApiConfig(UnionPayApiConfig);
@@ -54,7 +54,7 @@ public class UnionPayApiConfigKit {
     }
 
     public static void setThreadLocalMchId(String mchId) {
-        if (StrUtil.isEmpty(mchId)) {
+        if (StringUtils.isEmpty(mchId)) {
             mchId = CFG_MAP.get(DEFAULT_CFG_KEY).getMchId();
         }
         TL.set(mchId);
@@ -66,7 +66,7 @@ public class UnionPayApiConfigKit {
 
     public static String getMchId() {
         String appId = TL.get();
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getMchId();
         }
         return appId;

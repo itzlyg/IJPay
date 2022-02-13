@@ -1,16 +1,12 @@
 package com.ijpay.jdpay.kit;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.XmlUtil;
-import cn.hutool.crypto.SecureUtil;
+import com.ijpay.core.kit.CypherKit;
 import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.jdpay.util.SignUtil;
 import com.ijpay.jdpay.util.ThreeDesUtil;
 import com.ijpay.jdpay.util.XmlEncryptUtil;
-import org.w3c.dom.Document;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.xml.xpath.XPathConstants;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +25,6 @@ import java.util.Map;
  * @author Javen
  */
 public class JdPayKit {
-    /**
-     * MD5 加密
-     *
-     * @param data 需要加密的数据
-     * @return 加密后的数据
-     */
-    public static String md5LowerCase(String data) {
-        return SecureUtil.md5(data).toLowerCase();
-    }
 
     /**
      * 请求参数 Map 转化为京东支付 xml
@@ -95,7 +82,7 @@ public class JdPayKit {
      * @return 加密后的字符串
      */
     public static String threeDesEncrypt(String desKey, String sourceData) {
-        byte[] key = Base64.decode(desKey);
+        byte[] key = CypherKit.decodeToBytes(desKey);
         return ThreeDesUtil.encrypt2HexStr(key, sourceData);
     }
 
@@ -107,7 +94,7 @@ public class JdPayKit {
      * @return 解密后的字符串
      */
     public static String threeDecDecrypt(String desKey, String sourceData) {
-        byte[] key = Base64.decode(desKey);
+        byte[] key = CypherKit.decodeToBytes(desKey);
         return ThreeDesUtil.decrypt4HexStr(key, sourceData);
     }
 
@@ -120,12 +107,12 @@ public class JdPayKit {
      */
     public static Map<String, String> threeDesToMap(Map<String, String> map, String desKey) {
 
-        HashMap<String, String> tempMap = new HashMap<String, String>(map.size());
+        HashMap<String, String> tempMap = new HashMap<>();
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            if (StrUtil.isNotEmpty(value)) {
+            if (StringUtils.isNotEmpty(value)) {
                 if ("merchant".equals(name) || "version".equals(name) || "sign".equals(name)) {
                     tempMap.put(name, value);
                 } else {
@@ -143,19 +130,19 @@ public class JdPayKit {
      * @return 解析后的数据
      */
     public static Map<String, String> parseResp(String xml) {
-        if (StrUtil.isEmpty(xml)) {
+        if (StringUtils.isEmpty(xml)) {
             return null;
         }
-        Map<String, String> map = new HashMap<String, String>(3);
-        Document docResult = XmlUtil.parseXml(xml);
-        String code = (String) XmlUtil.getByXPath("//jdpay/result/code", docResult, XPathConstants.STRING);
-        String desc = (String) XmlUtil.getByXPath("//jdpay/result/desc", docResult, XPathConstants.STRING);
-        map.put("code", code);
-        map.put("desc", desc);
-        if ("000000".equals(code)) {
-            String encrypt = (String) XmlUtil.getByXPath("//jdpay/encrypt", docResult, XPathConstants.STRING);
-            map.put("encrypt", encrypt);
-        }
+        Map<String, String> map = new HashMap<>();
+//        Document docResult = XmlUtil.parseXml(xml);
+//        String code = (String) XmlUtil.getByXPath("//jdpay/result/code", docResult, XPathConstants.STRING);
+//        String desc = (String) XmlUtil.getByXPath("//jdpay/result/desc", docResult, XPathConstants.STRING);
+//        map.put("code", code);
+//        map.put("desc", desc);
+//        if ("000000".equals(code)) {
+//            String encrypt = (String) XmlUtil.getByXPath("//jdpay/encrypt", docResult, XPathConstants.STRING);
+//            map.put("encrypt", encrypt);
+//        }
         return map;
     }
 }

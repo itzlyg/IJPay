@@ -13,12 +13,11 @@
  */
 package com.ijpay.demo.controller.paypal;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.PayKit;
+import com.ijpay.core.utils.PayJsonUtil;
 import com.ijpay.demo.entity.PayPalBean;
 import com.ijpay.paypal.PayPalApi;
 import com.ijpay.paypal.PayPalApiConfig;
@@ -116,24 +115,23 @@ public class PayPalController {
 
             dataMap.put("application_context", applicationContext);
 
-            String data = JSONUtil.toJsonStr(dataMap);
+            String data = PayJsonUtil.toJson(dataMap);
             log.info(data);
             IJPayHttpResponse resData = PayPalApi.createOrder(config, data);
             log.info(resData.toString());
             if (resData.getStatus() == 201) {
                 String resultStr = resData.getBody();
-
-                JSONObject jsonObject = JSONUtil.parseObj(resultStr);
-                JSONArray links = jsonObject.getJSONArray("links");
-                for (int i = 0; i < links.size(); i++) {
-                    JSONObject item = links.getJSONObject(i);
-                    String rel = item.getStr("rel");
-                    String href = item.getStr("href");
-                    if ("approve".equalsIgnoreCase(rel)) {
-                        response.sendRedirect(href);
-                        break;
-                    }
-                }
+				JsonNode nodes = PayJsonUtil.toNode(resultStr, "links");
+				if (nodes != null && nodes.isArray()) {
+					for (JsonNode node : nodes) {
+						String rel = node.get("rel").asText();
+						if ("approve".equalsIgnoreCase(rel)) {
+							String href = node.get("href").asText();
+							response.sendRedirect(href);
+							break;
+						}
+					}
+				}
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -161,7 +159,7 @@ public class PayPalController {
 
             updateData.add(itemMap);
 
-            String data = JSONUtil.toJsonStr(updateData);
+            String data = PayJsonUtil.toJson(updateData);
             log.info(data);
             IJPayHttpResponse resData = PayPalApi.updateOrder(config, id, data);
             log.info(resData.toString());
@@ -246,7 +244,7 @@ public class PayPalController {
 
             map.put("amount", amount);
 
-            String data = JSONUtil.toJsonStr(map);
+            String data = PayJsonUtil.toJson(map);
             log.info("refund data：" + data);
             IJPayHttpResponse response = PayPalApi.refund(config, id, data);
             log.info(response.toString());

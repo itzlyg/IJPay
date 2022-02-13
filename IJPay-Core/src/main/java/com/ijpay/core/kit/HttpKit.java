@@ -1,10 +1,11 @@
 package com.ijpay.core.kit;
 
-import com.ijpay.core.http.AbstractHttpDelegate;
+import com.ijpay.core.IJPayHttpResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +24,107 @@ import java.util.Map;
  */
 public class HttpKit {
 
-    private static AbstractHttpDelegate delegate = new DefaultHttpKit();
+	/**
+	 * get 请求
+	 *
+	 * @param url      请求url
+	 * @param paramMap 请求参数
+	 * @return {@link String} 请求返回的结果
+	 */
+	public static String get(String url, Map<String, Object> paramMap) {
+		return null;
+	}
 
-    public static AbstractHttpDelegate getDelegate() {
-        return delegate;
-    }
+	/**
+	 * get 请求
+	 *
+	 * @param url      请求url
+	 * @param paramMap 请求参数
+	 * @param headers  请求头
+	 * @return {@link IJPayHttpResponse} 请求返回的结果
+	 */
+	public static IJPayHttpResponse get(String url, Map<String, Object> paramMap, Map<String, String> headers) {
+		IJPayHttpResponse response = new IJPayHttpResponse();
+//		HttpResponse httpResponse = getToResponse(url, paramMap, headers);
+//		response.setBody(httpResponse.body());
+//		response.setStatus(httpResponse.getStatus());
+//		response.setHeaders(httpResponse.headers());
+		return response;
+	}
 
-    public static void setDelegate(AbstractHttpDelegate delegate) {
-        HttpKit.delegate = delegate;
-    }
+	/**
+	 * post 请求
+	 *
+	 * @param url  请求url
+	 * @param data 请求参数
+	 * @return {@link String} 请求返回的结果
+	 */
+	public static String post(String url, String data) {
+		return null;
+	}
 
+	/**
+	 * post 请求
+	 *
+	 * @param url     请求url
+	 * @param paramMap    请求参数
+	 * @param headers 请求头
+	 * @return {@link IJPayHttpResponse}  请求返回的结果
+	 */
+	public static IJPayHttpResponse post(String url,  Map<String, Object> paramMap, Map<String, String> headers) {
+		IJPayHttpResponse response = new IJPayHttpResponse();
+//		HttpResponse httpResponse = postToResponse(url, headers, data);
+//		response.setBody(httpResponse.body());
+//		response.setStatus(httpResponse.getStatus());
+//		response.setHeaders(httpResponse.headers());
+		return response;
+	}
+
+	/**
+	 * post 请求
+	 *
+	 * @param url     请求url
+	 * @param data    请求参数
+	 * @param headers 请求头
+	 * @return {@link IJPayHttpResponse}  请求返回的结果
+	 */
+	public static IJPayHttpResponse post(String url, String data, Map<String, String> headers) {
+		IJPayHttpResponse response = new IJPayHttpResponse();
+//		HttpResponse httpResponse = postToResponse(url, headers, data);
+//		response.setBody(httpResponse.body());
+//		response.setStatus(httpResponse.getStatus());
+//		response.setHeaders(httpResponse.headers());
+		return response;
+	}
+
+	/**
+	 * post 请求
+	 *
+	 * @param url      请求url
+	 * @param data     请求参数
+	 * @param certPath 证书路径
+	 * @param certPass 证书密码
+	 * @return {@link String} 请求返回的结果
+	 */
+	public static String post(String url, String data, String certPath, String certPass) {
+		return null;
+	}
+
+	/**
+	 * post 请求
+	 *
+	 * @param url      请求url
+	 * @param data     请求参数
+	 * @param certFile 证书文件输入流
+	 * @param certPass 证书密码
+	 * @return {@link String} 请求返回的结果
+	 */
+	public static String post(String url, String data, InputStream certFile, String certPass) {
+		return null;
+	}
+	public static String post(String url, String data, String certPath, String certPass, String protocol) {
+		return null;
+	}
     public static String readData(HttpServletRequest request) {
         BufferedReader br = null;
         try {
@@ -77,12 +169,4 @@ public class HttpKit {
         }
         return params;
     }
-}
-
-/**
- * 使用 huTool 实现的 Http 工具类
- *
- * @author Javen
- */
-class DefaultHttpKit extends AbstractHttpDelegate {
 }

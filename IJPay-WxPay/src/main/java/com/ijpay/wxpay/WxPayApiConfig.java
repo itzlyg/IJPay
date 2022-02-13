@@ -1,6 +1,5 @@
 package com.ijpay.wxpay;
 
-import lombok.*;
 
 import java.io.Serializable;
 
@@ -17,12 +16,6 @@ import java.io.Serializable;
  *
  * @author Javen
  */
-
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class WxPayApiConfig implements Serializable {
     private static final long serialVersionUID = -9044503427692786302L;
     /**
@@ -73,4 +66,100 @@ public class WxPayApiConfig implements Serializable {
      * 其他附加参数
      */
     private Object exParams;
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getMchId() {
+		return mchId;
+	}
+
+	public void setMchId(String mchId) {
+		this.mchId = mchId;
+	}
+
+	public String getSlAppId() {
+		return slAppId;
+	}
+
+	public void setSlAppId(String slAppId) {
+		this.slAppId = slAppId;
+	}
+
+	public String getSlMchId() {
+		return slMchId;
+	}
+
+	public void setSlMchId(String slMchId) {
+		this.slMchId = slMchId;
+	}
+
+	public String getPartnerKey() {
+		return partnerKey;
+	}
+
+	public void setPartnerKey(String partnerKey) {
+		this.partnerKey = partnerKey;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public String getApiKey3() {
+		return apiKey3;
+	}
+
+	public void setApiKey3(String apiKey3) {
+		this.apiKey3 = apiKey3;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public String getCertPath() {
+		return certPath;
+	}
+
+	public void setCertPath(String certPath) {
+		this.certPath = certPath;
+	}
+
+	public String getKeyPemPath() {
+		return keyPemPath;
+	}
+
+	public void setKeyPemPath(String keyPemPath) {
+		this.keyPemPath = keyPemPath;
+	}
+
+	public String getCertPemPath() {
+		return certPemPath;
+	}
+
+	public void setCertPemPath(String certPemPath) {
+		this.certPemPath = certPemPath;
+	}
+
+	public Object getExParams() {
+		return exParams;
+	}
+
+	public void setExParams(Object exParams) {
+		this.exParams = exParams;
+	}
 }

@@ -1,10 +1,29 @@
 package com.ijpay.demo.controller.alipay;
 
-import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.domain.*;
+import com.alipay.api.domain.AlipayCommerceCityfacilitatorVoucherGenerateModel;
+import com.alipay.api.domain.AlipayDataDataserviceBillDownloadurlQueryModel;
+import com.alipay.api.domain.AlipayFundAccountQueryModel;
+import com.alipay.api.domain.AlipayFundAuthOrderFreezeModel;
+import com.alipay.api.domain.AlipayFundCouponOrderAgreementPayModel;
+import com.alipay.api.domain.AlipayFundTransCommonQueryModel;
+import com.alipay.api.domain.AlipayFundTransOrderQueryModel;
+import com.alipay.api.domain.AlipayFundTransToaccountTransferModel;
+import com.alipay.api.domain.AlipayFundTransUniTransferModel;
+import com.alipay.api.domain.AlipayOpenAuthTokenAppModel;
+import com.alipay.api.domain.AlipayOpenAuthTokenAppQueryModel;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.AlipayTradeCancelModel;
+import com.alipay.api.domain.AlipayTradeCloseModel;
+import com.alipay.api.domain.AlipayTradeCreateModel;
+import com.alipay.api.domain.AlipayTradeOrderSettleModel;
+import com.alipay.api.domain.AlipayTradePagePayModel;
+import com.alipay.api.domain.AlipayTradePayModel;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.domain.Participant;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.response.AlipayFundAuthOrderFreezeResponse;
 import com.alipay.api.response.AlipayFundCouponOrderAgreementPayResponse;
@@ -14,6 +33,8 @@ import com.ijpay.alipay.AliPayApiConfig;
 import com.ijpay.alipay.AliPayApiConfigKit;
 import com.ijpay.core.kit.PayKit;
 import com.ijpay.core.kit.RsaKit;
+import com.ijpay.core.utils.PayDateUtil;
+import com.ijpay.core.utils.PayJsonUtil;
 import com.ijpay.demo.entity.AliPayBean;
 import com.ijpay.demo.utils.StringUtils;
 import com.ijpay.demo.vo.AjaxResult;
@@ -27,7 +48,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,7 +161,7 @@ public class AliPayController extends AbstractAliPayApiController {
             paramsMap.put("return_url", aliPayBean.getDomain() + RETURN_URL);
             paramsMap.put("charset", aliPayApiConfig.getCharset());
             paramsMap.put("sign_type", aliPayApiConfig.getSignType());
-            paramsMap.put("timestamp", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+            paramsMap.put("timestamp", PayDateUtil.formatLocalDateTime(null, null));
             paramsMap.put("version", "1.0");
             paramsMap.put("notify_url", aliPayBean.getDomain() + NOTIFY_URL);
 
@@ -152,7 +172,7 @@ public class AliPayController extends AbstractAliPayApiController {
             bizMap.put("total_amount", "6.66");
             bizMap.put("product_code", "QUICK_WAP_WAY");
 
-            paramsMap.put("biz_content", JSON.toJSONString(bizMap));
+            paramsMap.put("biz_content", PayJsonUtil.toJson(bizMap));
 
             String content = PayKit.createLinkString(paramsMap);
 
@@ -288,8 +308,8 @@ public class AliPayController extends AbstractAliPayApiController {
         model.setOutTradeNo(StringUtils.getOutTradeNo());
         try {
             String resultStr = AliPayApi.tradePrecreatePayToResponse(model, notifyUrl).getBody();
-            JSONObject jsonObject = JSONObject.parseObject(resultStr);
-            return jsonObject.getJSONObject("alipay_trade_precreate_response").getString("qr_code");
+			// alipay_trade_precreate_response qr_code
+            return PayJsonUtil.key2Val(resultStr, "qr_code");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -677,7 +697,7 @@ public class AliPayController extends AbstractAliPayApiController {
         try {
             String signType = "MD5";
             String notifyUrl = aliPayBean.getDomain() + NOTIFY_URL;
-            Map<String, String> params = new HashMap<>(15);
+            Map<String, String> params = new HashMap<>();
             params.put("partner", "PID");
             params.put("sign_type", signType);
             params.put("notify_url", notifyUrl);

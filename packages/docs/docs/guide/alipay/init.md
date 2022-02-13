@@ -71,7 +71,7 @@ public class AliPayApiInterceptor implements Interceptor {
     public void intercept(Invocation inv) {
         Controller controller = inv.getController();
         String appId = controller.getPara("appId");
-        if (StrKit.isBlank(appId)) {
+        if (StringUtils.isBlank(appId)) {
             controller.renderJson(ajax.addError("应用的编号不能为空"));
             return;
         }

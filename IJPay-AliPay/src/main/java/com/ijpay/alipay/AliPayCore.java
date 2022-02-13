@@ -1,12 +1,16 @@
 package com.ijpay.alipay;
 
-import cn.hutool.crypto.SecureUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConstants;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.ijpay.core.kit.CypherKit;
 import enums.SignType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
@@ -33,7 +37,7 @@ public class AliPayCore {
         // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
         String preStr = createLinkString(params);
         if (SignType.MD5.getType().equals(signType)) {
-            return SecureUtil.md5(preStr.concat(key));
+            return CypherKit.md5(preStr.concat(key));
         } else if (SignType.RSA2.getType().equals(signType)) {
             return AlipaySignature.rsa256Sign(preStr, key, AlipayConstants.CHARSET_UTF8);
         } else if (SignType.RSA.getType().equals(signType)) {
@@ -77,7 +81,7 @@ public class AliPayCore {
         if (params == null) {
             return null;
         }
-        Map<String, String> result = new HashMap<>(params.size());
+        Map<String, String> result = new HashMap<>();
         if (params.size() <= 0) {
             return result;
         }

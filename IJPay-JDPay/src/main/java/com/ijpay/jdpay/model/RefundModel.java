@@ -13,15 +13,6 @@
  */
 package com.ijpay.jdpay.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class RefundModel extends JdBaseModel {
     private String version;
     private String merchant;
@@ -36,4 +27,108 @@ public class RefundModel extends JdBaseModel {
     private String device;
     private String termInfoId;
     private String cert;
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getMerchant() {
+		return merchant;
+	}
+
+	public void setMerchant(String merchant) {
+		this.merchant = merchant;
+	}
+
+	public String getTradeNum() {
+		return tradeNum;
+	}
+
+	public void setTradeNum(String tradeNum) {
+		this.tradeNum = tradeNum;
+	}
+
+	public String getoTradeNum() {
+		return oTradeNum;
+	}
+
+	public void setoTradeNum(String oTradeNum) {
+		this.oTradeNum = oTradeNum;
+	}
+
+	public String getAmount() {
+		return amount;
+	}
+
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public String getTradeTime() {
+		return tradeTime;
+	}
+
+	public void setTradeTime(String tradeTime) {
+		this.tradeTime = tradeTime;
+	}
+
+	public String getNotifyUrl() {
+		return notifyUrl;
+	}
+
+	public void setNotifyUrl(String notifyUrl) {
+		this.notifyUrl = notifyUrl;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
+	public String getTermInfoId() {
+		return termInfoId;
+	}
+
+	public void setTermInfoId(String termInfoId) {
+		this.termInfoId = termInfoId;
+	}
+
+	public String getCert() {
+		return cert;
+	}
+
+	public void setCert(String cert) {
+		this.cert = cert;
+	}
 }

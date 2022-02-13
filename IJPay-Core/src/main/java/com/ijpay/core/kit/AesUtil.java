@@ -1,6 +1,5 @@
 package com.ijpay.core.kit;
 
-import cn.hutool.core.codec.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -60,7 +59,7 @@ public class AesUtil {
             cipher.init(Cipher.DECRYPT_MODE, key, spec);
             cipher.updateAAD(associatedData);
 
-            return new String(cipher.doFinal(Base64.decode(cipherText)), StandardCharsets.UTF_8);
+            return new String(cipher.doFinal(CypherKit.encodeToBytes(cipherText)), StandardCharsets.UTF_8);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException(e);
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {

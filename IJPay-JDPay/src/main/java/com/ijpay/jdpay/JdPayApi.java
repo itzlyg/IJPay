@@ -144,7 +144,7 @@ public class JdPayApi {
     }
 
     public static String doPost(String url, String reqXml) {
-        return HttpKit.getDelegate().post(url, reqXml);
+        return HttpKit.post(url, reqXml);
     }
 
 }

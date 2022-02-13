@@ -1,7 +1,6 @@
 package com.ijpay.wxpay.model;
 
 import com.ijpay.core.model.BaseModel;
-import lombok.*;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付等常用的支付方式以及各种常用的接口。</p>
@@ -16,14 +15,50 @@ import lombok.*;
  *
  * @author Javen
  */
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class QueryWorkWxRedPackModel extends BaseModel {
     private String nonce_str;
     private String sign;
     private String mch_billno;
     private String mch_id;
     private String appid;
+
+	public String getNonce_str() {
+		return nonce_str;
+	}
+
+	public void setNonce_str(String nonce_str) {
+		this.nonce_str = nonce_str;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getMch_billno() {
+		return mch_billno;
+	}
+
+	public void setMch_billno(String mch_billno) {
+		this.mch_billno = mch_billno;
+	}
+
+	public String getMch_id() {
+		return mch_id;
+	}
+
+	public void setMch_id(String mch_id) {
+		this.mch_id = mch_id;
+	}
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
 }

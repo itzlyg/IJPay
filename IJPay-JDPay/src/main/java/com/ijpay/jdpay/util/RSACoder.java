@@ -1,9 +1,17 @@
 package com.ijpay.jdpay.util;
 
+import com.ijpay.core.kit.CypherKit;
+
 import javax.crypto.Cipher;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -20,7 +28,7 @@ public class RSACoder extends RsaUtil {
     public static final String PRIVATE_KEY = "RSAPrivateKey";
 
     public static String sign(byte[] data, String privateKey) throws Exception {
-        byte[] keyBytes = decryptBASE64(privateKey);
+        byte[] keyBytes = CypherKit.decodeToBytes(privateKey);
 
 
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -36,12 +44,12 @@ public class RSACoder extends RsaUtil {
         signature.initSign(priKey);
         signature.update(data);
 
-        return encryptBASE64(signature.sign());
+        return CypherKit.encode(signature.sign());
     }
 
 
     public static boolean verify(byte[] data, String publicKey, String sign) throws Exception {
-        byte[] keyBytes = decryptBASE64(publicKey);
+        byte[] keyBytes = CypherKit.decodeToBytes(publicKey);
 
 
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
@@ -57,12 +65,12 @@ public class RSACoder extends RsaUtil {
         signature.update(data);
 
 
-        return signature.verify(decryptBASE64(sign));
+        return signature.verify(CypherKit.decodeToBytes(sign));
     }
 
 
     public static byte[] decryptByPrivateKey(byte[] data, String key) throws Exception {
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = CypherKit.decodeToBytes(key);
 
 
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -78,7 +86,7 @@ public class RSACoder extends RsaUtil {
 
 
     public static byte[] decryptByPublicKey(byte[] data, String key) throws Exception {
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = CypherKit.decodeToBytes(key);
 
 
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
@@ -93,7 +101,7 @@ public class RSACoder extends RsaUtil {
 
 
     public static byte[] encryptByPublicKey(byte[] data, String key) throws Exception {
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = CypherKit.decodeToBytes(key);
 
 
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
@@ -109,7 +117,7 @@ public class RSACoder extends RsaUtil {
 
 
     public static byte[] encryptByPrivateKey(byte[] data, String key) throws Exception {
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = CypherKit.decodeToBytes(key);
 
 
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -127,14 +135,14 @@ public class RSACoder extends RsaUtil {
     public static String getPrivateKey(Map<String, Object> keyMap) throws Exception {
         Key key = (Key) keyMap.get("RSAPrivateKey");
 
-        return encryptBASE64(key.getEncoded());
+        return CypherKit.encode(key.getEncoded());
     }
 
 
     public static String getPublicKey(Map<String, Object> keyMap) throws Exception {
         Key key = (Key) keyMap.get("RSAPublicKey");
 
-        return encryptBASE64(key.getEncoded());
+        return CypherKit.encode(key.getEncoded());
     }
 
 
@@ -146,7 +154,7 @@ public class RSACoder extends RsaUtil {
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        Map<String, Object> keyMap = new HashMap<String, Object>(2);
+        Map<String, Object> keyMap = new HashMap<>();
         keyMap.put("RSAPublicKey", publicKey);
         keyMap.put("RSAPrivateKey", privateKey);
         return keyMap;

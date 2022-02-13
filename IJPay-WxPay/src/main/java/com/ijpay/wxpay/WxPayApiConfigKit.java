@@ -1,6 +1,6 @@
 package com.ijpay.wxpay;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class WxPayApiConfigKit {
     }
 
     public static WxPayApiConfig setThreadLocalWxPayApiConfig(WxPayApiConfig wxPayApiConfig) {
-        if (StrUtil.isNotEmpty(wxPayApiConfig.getAppId())) {
+        if (StringUtils.isNotEmpty(wxPayApiConfig.getAppId())) {
             setThreadLocalAppId(wxPayApiConfig.getAppId());
         }
         return putApiConfig(wxPayApiConfig);
@@ -54,7 +54,7 @@ public class WxPayApiConfigKit {
     }
 
     public static void setThreadLocalAppId(String appId) {
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         TL.set(appId);
@@ -66,7 +66,7 @@ public class WxPayApiConfigKit {
 
     public static String getAppId() {
         String appId = TL.get();
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         return appId;

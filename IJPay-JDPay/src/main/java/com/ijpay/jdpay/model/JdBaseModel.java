@@ -1,9 +1,9 @@
 
 package com.ijpay.jdpay.model;
 
-import cn.hutool.core.util.StrUtil;
 import com.ijpay.core.model.BaseModel;
 import com.ijpay.jdpay.kit.JdPayKit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -32,16 +32,15 @@ public class JdBaseModel extends BaseModel {
      */
     public String genReqXml(String rsaPrivateKey, String strDesKey, String version, String merchant) {
 
-        if (StrUtil.isEmpty(version) || StrUtil.isEmpty(merchant)) {
+        if (StringUtils.isEmpty(version) || StringUtils.isEmpty(merchant)) {
             throw new RuntimeException("version or merchant is empty");
         }
         String encrypt = JdPayKit.encrypt(rsaPrivateKey, strDesKey, JdPayKit.toJdXml(toMap()));
-        Map<String, String> requestMap = JdRequestModel.builder()
-                .version(version)
-                .merchant(merchant)
-                .encrypt(encrypt)
-                .build()
-                .toMap();
+		JdRequestModel model = new JdRequestModel();
+		model.setVersion(version);
+		model.setMerchant(merchant);
+		model.setEncrypt(encrypt);
+        Map<String, String> requestMap = model.toMap();
         return JdPayKit.toJdXml(requestMap);
     }
 

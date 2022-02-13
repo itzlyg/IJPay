@@ -1,6 +1,6 @@
 package com.ijpay.qqpay;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class QqPayApiConfigKit {
     }
 
     public static QqPayApiConfig setThreadLocalQqPayApiConfig(QqPayApiConfig qqPayApiConfig) {
-        if (StrUtil.isNotEmpty(qqPayApiConfig.getAppId())) {
+        if (StringUtils.isNotEmpty(qqPayApiConfig.getAppId())) {
             setThreadLocalAppId(qqPayApiConfig.getAppId());
         }
         return putApiConfig(qqPayApiConfig);
@@ -54,7 +54,7 @@ public class QqPayApiConfigKit {
     }
 
     public static void setThreadLocalAppId(String appId) {
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         TL.set(appId);
@@ -66,7 +66,7 @@ public class QqPayApiConfigKit {
 
     public static String getAppId() {
         String appId = TL.get();
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         return appId;

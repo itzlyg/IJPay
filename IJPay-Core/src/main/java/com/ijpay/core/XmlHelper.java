@@ -220,7 +220,7 @@ public class XmlHelper {
 
         // 将节点封装成map形式
         NodeList list = root.getChildNodes();
-        Map<String, String> params = new HashMap<String, String>(list.getLength());
+        Map<String, String> params = new HashMap<>();
         for (int i = 0; i < list.getLength(); i++) {
             Node node = list.item(i);
             params.put(node.getNodeName(), node.getTextContent());

@@ -14,19 +14,51 @@
 package com.ijpay.qqpay.model;
 
 import com.ijpay.core.model.BaseModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class GetTransferInfoModel extends BaseModel {
     private String  mch_id;
     private String  nonce_str;
     private String  sign;
     private String  out_trade_no;
     private String  transaction_id;
+
+	public String getMch_id() {
+		return mch_id;
+	}
+
+	public void setMch_id(String mch_id) {
+		this.mch_id = mch_id;
+	}
+
+	public String getNonce_str() {
+		return nonce_str;
+	}
+
+	public void setNonce_str(String nonce_str) {
+		this.nonce_str = nonce_str;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getOut_trade_no() {
+		return out_trade_no;
+	}
+
+	public void setOut_trade_no(String out_trade_no) {
+		this.out_trade_no = out_trade_no;
+	}
+
+	public String getTransaction_id() {
+		return transaction_id;
+	}
+
+	public void setTransaction_id(String transaction_id) {
+		this.transaction_id = transaction_id;
+	}
 }

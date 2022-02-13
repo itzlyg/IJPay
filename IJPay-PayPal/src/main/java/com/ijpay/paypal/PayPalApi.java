@@ -1,17 +1,15 @@
 
 package com.ijpay.paypal;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.ContentType;
 import com.ijpay.core.IJPayHttpResponse;
+import com.ijpay.core.kit.CypherKit;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.PayKit;
 import com.ijpay.paypal.accesstoken.AccessToken;
 import com.ijpay.paypal.accesstoken.AccessTokenKit;
 import com.ijpay.paypal.enums.PayPalApiUrl;
+import org.apache.commons.lang3.StringUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,11 +46,12 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse getToken(PayPalApiConfig config) {
-        Map<String, String> headers = new HashMap<>(3);
-        headers.put("Accept", ContentType.JSON.toString());
-        headers.put("Content-Type", ContentType.FORM_URLENCODED.toString());
-        headers.put("Authorization", "Basic ".concat(Base64.encode((config.getClientId().concat(":").concat(config.getSecret())).getBytes(StandardCharsets.UTF_8))));
-        Map<String, Object> params = new HashMap<>(1);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json");
+		// application/x-www-form-urlencoded
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("Authorization", "Basic ".concat(CypherKit.encode((config.getClientId().concat(":").concat(config.getSecret())))));
+        Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
         return post(getReqUrl(PayPalApiUrl.GET_TOKEN, config.isSandBox()), params, headers);
     }
@@ -159,7 +158,7 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse post(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().post(url, params, headers);
+        return HttpKit.post(url, params, headers);
     }
 
     /**
@@ -171,7 +170,7 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse get(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().get(url, params, headers);
+        return HttpKit.get(url, params, headers);
     }
 
     /**
@@ -183,7 +182,7 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse post(String url, String data, Map<String, String> headers) {
-        return HttpKit.getDelegate().post(url, data, headers);
+        return HttpKit.post(url, data, headers);
     }
 
     /**
@@ -195,7 +194,8 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse patch(String url, String data, Map<String, String> headers) {
-        return HttpKit.getDelegate().patch(url, data, headers);
+		// TODO
+        return null ;//HttpKit.patch(url, data, headers);
     }
 
     public static Map<String, String> getBaseHeaders(AccessToken accessToken) {
@@ -205,20 +205,21 @@ public class PayPalApi {
     public static Map<String, String> getBaseHeaders(AccessToken accessToken, String payPalRequestId,
                                                      String payPalPartnerAttributionId, String prefer) {
         if (accessToken == null ||
-                StrUtil.isEmpty(accessToken.getTokenType()) ||
-                StrUtil.isEmpty(accessToken.getAccessToken())) {
+                StringUtils.isEmpty(accessToken.getTokenType()) ||
+                StringUtils.isEmpty(accessToken.getAccessToken())) {
             throw new RuntimeException("accessToken is null");
         }
-        Map<String, String> headers = new HashMap<>(3);
-        headers.put("Content-Type", ContentType.JSON.toString());
+        Map<String, String> headers = new HashMap<>();
+		// application/json
+        headers.put("Content-Type", "application/json");
         headers.put("Authorization", accessToken.getTokenType().concat(" ").concat(accessToken.getAccessToken()));
-        if (StrUtil.isNotEmpty(payPalRequestId)) {
+        if (StringUtils.isNotEmpty(payPalRequestId)) {
             headers.put("PayPal-Request-Id", payPalRequestId);
         }
-        if (StrUtil.isNotEmpty(payPalPartnerAttributionId)) {
+        if (StringUtils.isNotEmpty(payPalPartnerAttributionId)) {
             headers.put("PayPal-Partner-Attribution-Id", payPalPartnerAttributionId);
         }
-        if (StrUtil.isNotEmpty(prefer)) {
+        if (StringUtils.isNotEmpty(prefer)) {
             headers.put("Prefer", prefer);
         }
         return headers;

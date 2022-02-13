@@ -1,9 +1,13 @@
 package com.ijpay.jdpay.util;
 
-import org.apache.commons.codec.binary.Base64;
+import com.ijpay.core.kit.CypherKit;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class SignUtil {
     private static List<String> unSignKeyList = Arrays.asList(new String[]{"merchantSign", "token", "version"});
@@ -16,7 +20,7 @@ public class SignUtil {
             String sha256SourceSignString = SHAUtil.Encrypt(sourceSignString, null);
 
             byte[] newsks = RSACoder.encryptByPrivateKey(sha256SourceSignString.getBytes("UTF-8"), rsaPriKey);
-            result = Base64.encodeBase64String(newsks);
+            result = CypherKit.encode(newsks);
         } catch (Exception e) {
             throw new RuntimeException("sign4SelectedKeys>error", e);
         }
@@ -33,7 +37,7 @@ public class SignUtil {
             String sha256SourceSignString = SHAUtil.Encrypt(sourceSignString, null);
 
             byte[] newK = RSACoder.encryptByPrivateKey(sha256SourceSignString.getBytes("UTF-8"), rsaPriKey);
-            result = Base64.encodeBase64String(newK);
+            result = CypherKit.encode(newK);
         } catch (Exception e) {
             e.printStackTrace();
         }

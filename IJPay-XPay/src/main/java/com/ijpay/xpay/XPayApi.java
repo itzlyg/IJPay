@@ -43,7 +43,7 @@ public class XPayApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse post(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().post(url, params, headers);
+        return HttpKit.post(url, params, headers);
     }
 
     /**
@@ -55,7 +55,7 @@ public class XPayApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse get(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().get(url, params, headers);
+        return HttpKit.get(url, params, headers);
     }
 
     /**
@@ -67,7 +67,7 @@ public class XPayApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse exePost(String serverUrl, XPayUrl xPayUrl, Map<String, String> params) {
-        Map<String, Object> dataMap = new HashMap<String, Object>(params);
+        Map<String, Object> dataMap = new HashMap<>();
         return post(getReqUrl(serverUrl, xPayUrl), dataMap, null);
     }
 
@@ -80,7 +80,7 @@ public class XPayApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse exeGet(String serverUrl, XPayUrl xPayUrl, Map<String, String> params) {
-        Map<String, Object> dataMap = new HashMap<String, Object>(params);
+        Map<String, Object> dataMap = new HashMap<>();
         return get(getReqUrl(serverUrl, xPayUrl), dataMap, null);
     }
 }

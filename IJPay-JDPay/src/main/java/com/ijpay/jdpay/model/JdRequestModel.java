@@ -13,17 +13,33 @@
  */
 package com.ijpay.jdpay.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class JdRequestModel extends JdBaseModel {
     private String version;
     private String merchant;
     private String encrypt;
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getMerchant() {
+		return merchant;
+	}
+
+	public void setMerchant(String merchant) {
+		this.merchant = merchant;
+	}
+
+	public String getEncrypt() {
+		return encrypt;
+	}
+
+	public void setEncrypt(String encrypt) {
+		this.encrypt = encrypt;
+	}
 }

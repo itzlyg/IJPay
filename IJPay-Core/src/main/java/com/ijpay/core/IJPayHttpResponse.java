@@ -1,9 +1,9 @@
 
 package com.ijpay.core;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.CaseInsensitiveMap;
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -54,14 +54,14 @@ public class IJPayHttpResponse implements Serializable {
 
     public String getHeader(String name) {
         List<String> values = this.headerList(name);
-        return CollectionUtil.isEmpty(values) ? null : values.get(0);
+        return CollectionUtils.isEmpty(values) ? null : values.get(0);
     }
 
     private List<String> headerList(String name) {
-        if (StrUtil.isBlank(name)) {
+        if (StringUtils.isBlank(name)) {
             return null;
         } else {
-            CaseInsensitiveMap<String, List<String>> headersIgnoreCase = new CaseInsensitiveMap<>(getHeaders());
+            Map<String, List<String>> headersIgnoreCase = new CaseInsensitiveMap<>(getHeaders());
             return headersIgnoreCase.get(name.trim());
         }
     }

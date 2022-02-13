@@ -1,10 +1,6 @@
 package com.ijpay.qqpay.model;
 
 import com.ijpay.core.model.BaseModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付等常用的支付方式以及各种常用的接口。</p>
@@ -19,11 +15,6 @@ import lombok.Setter;
  *
  * @author Javen
  */
-
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class GetHbInfoModel extends BaseModel {
     private String send_type;
     private String nonce_str;
@@ -32,4 +23,60 @@ public class GetHbInfoModel extends BaseModel {
     private String listid;
     private String sub_mch_id;
     private String sign;
+
+	public String getSend_type() {
+		return send_type;
+	}
+
+	public void setSend_type(String send_type) {
+		this.send_type = send_type;
+	}
+
+	public String getNonce_str() {
+		return nonce_str;
+	}
+
+	public void setNonce_str(String nonce_str) {
+		this.nonce_str = nonce_str;
+	}
+
+	public String getMch_id() {
+		return mch_id;
+	}
+
+	public void setMch_id(String mch_id) {
+		this.mch_id = mch_id;
+	}
+
+	public String getMch_billno() {
+		return mch_billno;
+	}
+
+	public void setMch_billno(String mch_billno) {
+		this.mch_billno = mch_billno;
+	}
+
+	public String getListid() {
+		return listid;
+	}
+
+	public void setListid(String listid) {
+		this.listid = listid;
+	}
+
+	public String getSub_mch_id() {
+		return sub_mch_id;
+	}
+
+	public void setSub_mch_id(String sub_mch_id) {
+		this.sub_mch_id = sub_mch_id;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
 }

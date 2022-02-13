@@ -1,14 +1,14 @@
 package com.ijpay.core.kit;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.enums.RequestMethod;
 import com.ijpay.core.enums.SignType;
+import com.ijpay.core.utils.PayJsonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -33,16 +33,10 @@ import java.util.Map;
  * @author Javen
  */
 public class WxPayKit {
+
     private static final String FIELD_SIGN = "sign";
+
     private static final String FIELD_SIGN_TYPE = "sign_type";
-
-    public static String hmacSha256(String data, String key) {
-        return PayKit.hmacSha256(data, key);
-    }
-
-    public static String md5(String data) {
-        return PayKit.md5(data);
-    }
 
     /**
      * AES 解密
@@ -52,7 +46,7 @@ public class WxPayKit {
      * @return 解密后的数据
      */
     public static String decryptData(String base64Data, String key) {
-        return PayKit.decryptData(base64Data, key);
+        return CypherKit.decryptAes(base64Data, key);
     }
 
     /**
@@ -63,7 +57,7 @@ public class WxPayKit {
      * @return 加密后的数据
      */
     public static String encryptData(String data, String key) {
-        return PayKit.encryptData(data, key);
+        return CypherKit.encryptAes(data, key);
     }
 
     public static String generateStr() {
@@ -115,9 +109,9 @@ public class WxPayKit {
         String tempStr = PayKit.createLinkString(params);
         String stringSignTemp = tempStr + "&key=" + partnerKey;
         if (signType == SignType.MD5) {
-            return md5(stringSignTemp).toUpperCase();
+            return CypherKit.md5(stringSignTemp).toUpperCase();
         } else {
-            return hmacSha256(stringSignTemp, partnerKey).toUpperCase();
+            return CypherKit.hmacSha256(stringSignTemp, partnerKey);
         }
     }
 
@@ -133,7 +127,7 @@ public class WxPayKit {
         params.remove(FIELD_SIGN);
         String tempStr = PayKit.createLinkString(params);
         String stringSignTemp = tempStr + "&secret=" + secret;
-        return md5(stringSignTemp).toUpperCase();
+        return CypherKit.md5(stringSignTemp).toUpperCase();
     }
 
     /**
@@ -221,11 +215,11 @@ public class WxPayKit {
      * @return {String}
      */
     public static String bizPayUrl(String partnerKey, String appId, String mchId, String productId, String timeStamp, String nonceStr, SignType signType) {
-        HashMap<String, String> map = new HashMap<>(5);
+        HashMap<String, String> map = new HashMap<>();
         map.put("appid", appId);
         map.put("mch_id", mchId);
-        map.put("time_stamp", StrUtil.isEmpty(timeStamp) ? Long.toString(System.currentTimeMillis() / 1000) : timeStamp);
-        map.put("nonce_str", StrUtil.isEmpty(nonceStr) ? WxPayKit.generateStr() : nonceStr);
+        map.put("time_stamp", StringUtils.isEmpty(timeStamp) ? Long.toString(System.currentTimeMillis() / 1000) : timeStamp);
+        map.put("nonce_str", StringUtils.isEmpty(nonceStr) ? WxPayKit.generateStr() : nonceStr);
         map.put("product_id", productId);
         return bizPayUrl(createSign(map, partnerKey, signType), appId, mchId, productId, timeStamp, nonceStr);
     }
@@ -243,7 +237,7 @@ public class WxPayKit {
     public static String bizPayUrl(String partnerKey, String appId, String mchId, String productId) {
         String timeStamp = Long.toString(System.currentTimeMillis() / 1000);
         String nonceStr = WxPayKit.generateStr();
-        HashMap<String, String> map = new HashMap<>(5);
+        HashMap<String, String> map = new HashMap<>();
         map.put("appid", appId);
         map.put("mch_id", mchId);
         map.put("time_stamp", timeStamp);
@@ -275,7 +269,7 @@ public class WxPayKit {
      * @return 是否是 SUCCESS
      */
     public static boolean codeIsOk(String codeValue) {
-        return StrUtil.isNotEmpty(codeValue) && "SUCCESS".equals(codeValue);
+        return StringUtils.isNotEmpty(codeValue) && "SUCCESS".equals(codeValue);
     }
 
     /**
@@ -289,7 +283,7 @@ public class WxPayKit {
      * @return 再次签名后的 Map
      */
     public static Map<String, String> prepayIdCreateSign(String prepayId, String appId, String partnerKey, SignType signType) {
-        Map<String, String> packageParams = new HashMap<>(6);
+        Map<String, String> packageParams = new HashMap<>();
         packageParams.put("appId", appId);
         packageParams.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
         packageParams.put("nonceStr", String.valueOf(System.currentTimeMillis()));
@@ -316,7 +310,7 @@ public class WxPayKit {
         String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
         String nonceStr = String.valueOf(System.currentTimeMillis());
         String packageStr = "prepay_id=" + prepayId;
-        Map<String, String> packageParams = new HashMap<>(6);
+        Map<String, String> packageParams = new HashMap<>();
         packageParams.put("appId", appId);
         packageParams.put("timeStamp", timeStamp);
         packageParams.put("nonceStr", nonceStr);
@@ -347,7 +341,7 @@ public class WxPayKit {
      * @return 再次签名后的 Map
      */
     public static Map<String, String> appPrepayIdCreateSign(String appId, String partnerId, String prepayId, String partnerKey, SignType signType) {
-        Map<String, String> packageParams = new HashMap<>(8);
+        Map<String, String> packageParams = new HashMap<>();
         packageParams.put("appid", appId);
         packageParams.put("partnerid", partnerId);
         packageParams.put("prepayid", prepayId);
@@ -375,7 +369,7 @@ public class WxPayKit {
     public static Map<String, String> appCreateSign(String appId, String partnerId, String prepayId, String keyPath) throws Exception {
         String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
         String nonceStr = String.valueOf(System.currentTimeMillis());
-        Map<String, String> packageParams = new HashMap<>(8);
+        Map<String, String> packageParams = new HashMap<>();
         packageParams.put("appid", appId);
         packageParams.put("partnerid", partnerId);
         packageParams.put("prepayid", prepayId);
@@ -407,7 +401,7 @@ public class WxPayKit {
      * @return 再次签名后的 Map
      */
     public static Map<String, String> miniAppPrepayIdCreateSign(String appId, String prepayId, String partnerKey, SignType signType) {
-        Map<String, String> packageParams = new HashMap<>(6);
+        Map<String, String> packageParams = new HashMap<>();
         packageParams.put("appId", appId);
         packageParams.put("timeStamp", String.valueOf(System.currentTimeMillis() / 1000));
         packageParams.put("nonceStr", String.valueOf(System.currentTimeMillis()));
@@ -529,7 +523,7 @@ public class WxPayKit {
         String body = (String) map.get("body");
         String nonceStr = (String) map.get("nonceStr");
         String timestamp = (String) map.get("timestamp");
-        return verifySignature(signature, body, nonceStr, timestamp, FileUtil.getInputStream(certPath));
+        return verifySignature(signature, body, nonceStr, timestamp, getInputStream(certPath));
     }
 
     /**
@@ -545,8 +539,18 @@ public class WxPayKit {
         String nonceStr = response.getHeader("Wechatpay-Nonce");
         String signature = response.getHeader("Wechatpay-Signature");
         String body = response.getBody();
-        return verifySignature(signature, body, nonceStr, timestamp, FileUtil.getInputStream(certPath));
+        return verifySignature(signature, body, nonceStr, timestamp, getInputStream(certPath));
     }
+
+	private static BufferedInputStream getInputStream (String path){
+		try {
+			InputStream is = new FileInputStream(path);
+			return new BufferedInputStream(is);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
     /**
      * 验证签名
@@ -650,17 +654,15 @@ public class WxPayKit {
 		// 获取平台证书序列号
 		X509Certificate certificate = PayKit.getCertificate(certInputStream);
 		String serialNumber = certificate.getSerialNumber().toString(16).toUpperCase();
-		System.out.println(serialNumber);
 		// 验证证书序列号
 		if (serialNumber.equals(serialNo)) {
 			boolean verifySignature = WxPayKit.verifySignature(signature, body, nonce, timestamp,
 				certificate.getPublicKey());
 			if (verifySignature) {
-				JSONObject resultObject = JSONUtil.parseObj(body);
-				JSONObject resource = resultObject.getJSONObject("resource");
-				String cipherText = resource.getStr("ciphertext");
-				String nonceStr = resource.getStr("nonce");
-				String associatedData = resource.getStr("associated_data");
+				Map<String, String> resource = PayJsonUtil.toPojo(body, Map.class);
+				String cipherText = resource.get("ciphertext");
+				String nonceStr = resource.get("nonce");
+				String associatedData = resource.get("associated_data");
 
 				AesUtil aesUtil = new AesUtil(key.getBytes(StandardCharsets.UTF_8));
 				// 密文解密
@@ -692,7 +694,7 @@ public class WxPayKit {
      */
     public static String verifyNotify(String serialNo, String body, String signature, String nonce,
                                       String timestamp, String key, String certPath) throws Exception {
-        BufferedInputStream inputStream = FileUtil.getInputStream(certPath);
+        BufferedInputStream inputStream = getInputStream(certPath);
         return verifyNotify(serialNo, body, signature, nonce, timestamp, key, inputStream);
     }
 }

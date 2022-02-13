@@ -22,7 +22,7 @@ public class UnionPayApi {
     public static String authUrl = "https://qr.95516.com/qrcGtwWeb-web/api/userAuth?version=1.0.0&redirectUrl=%s";
 
     public static String execution(String url, Map<String, String> params) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params));
+        return HttpKit.post(url, WxPayKit.toXml(params));
     }
 
     /**

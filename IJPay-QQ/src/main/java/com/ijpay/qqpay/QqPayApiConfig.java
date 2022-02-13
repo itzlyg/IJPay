@@ -1,7 +1,5 @@
 package com.ijpay.qqpay;
 
-import lombok.*;
-
 import java.io.Serializable;
 
 /**
@@ -17,14 +15,9 @@ import java.io.Serializable;
  *
  * @author Javen
  */
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class QqPayApiConfig implements Serializable {
     private static final long serialVersionUID = 8365822256469245771L;
-    
+
     private String appId;
     private String mchId;
     private String slAppId;
@@ -33,4 +26,68 @@ public class QqPayApiConfig implements Serializable {
     private String domain;
     private String certPath;
     private Object exParams;
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getMchId() {
+		return mchId;
+	}
+
+	public void setMchId(String mchId) {
+		this.mchId = mchId;
+	}
+
+	public String getSlAppId() {
+		return slAppId;
+	}
+
+	public void setSlAppId(String slAppId) {
+		this.slAppId = slAppId;
+	}
+
+	public String getSlMchId() {
+		return slMchId;
+	}
+
+	public void setSlMchId(String slMchId) {
+		this.slMchId = slMchId;
+	}
+
+	public String getPartnerKey() {
+		return partnerKey;
+	}
+
+	public void setPartnerKey(String partnerKey) {
+		this.partnerKey = partnerKey;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public String getCertPath() {
+		return certPath;
+	}
+
+	public void setCertPath(String certPath) {
+		this.certPath = certPath;
+	}
+
+	public Object getExParams() {
+		return exParams;
+	}
+
+	public void setExParams(Object exParams) {
+		this.exParams = exParams;
+	}
 }

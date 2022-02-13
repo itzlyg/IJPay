@@ -13,9 +13,9 @@
  */
 package com.ijpay.core.model;
 
-import cn.hutool.core.util.StrUtil;
-import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.core.enums.SignType;
+import com.ijpay.core.kit.WxPayKit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,10 +31,10 @@ public class BaseModel {
      */
     public Map<String, String> toMap() {
         String[] fieldNames = getFiledNames(this);
-        HashMap<String, String> map = new HashMap<String, String>(fieldNames.length);
+        HashMap<String, String> map = new HashMap<String, String>();
         for (String name : fieldNames) {
             String value = (String) getFieldValueByName(name, this);
-            if (StrUtil.isNotEmpty(value)) {
+            if (StringUtils.isNotEmpty(value)) {
                 map.put(name, value);
             }
         }

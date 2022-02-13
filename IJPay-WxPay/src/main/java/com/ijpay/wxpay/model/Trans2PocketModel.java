@@ -14,15 +14,7 @@
 package com.ijpay.wxpay.model;
 
 import com.ijpay.core.model.BaseModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class Trans2PocketModel extends BaseModel {
     private String appid;
     private String mch_id;
@@ -42,4 +34,12 @@ public class Trans2PocketModel extends BaseModel {
     private String approval_type;
     private String act_name;
     private String agentid;
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
 }

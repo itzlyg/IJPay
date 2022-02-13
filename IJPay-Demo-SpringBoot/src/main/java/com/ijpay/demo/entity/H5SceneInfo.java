@@ -1,7 +1,5 @@
 package com.ijpay.demo.entity;
 
-import com.alibaba.fastjson.JSON;
-
 /**
  * @author Javen
  */
@@ -16,11 +14,6 @@ public class H5SceneInfo {
         this.h5_info = h5_info;
     }
 
-
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
-    }
 
 
     public static class H5 {

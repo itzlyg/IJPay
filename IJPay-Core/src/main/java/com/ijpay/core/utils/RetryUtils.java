@@ -1,8 +1,5 @@
 package com.ijpay.core.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
  *
@@ -17,7 +14,6 @@ import org.slf4j.LoggerFactory;
  * @author Javen
  */
 public class RetryUtils {
-    private static final Logger log = LoggerFactory.getLogger(RetryUtils.class);
 
     /**
      * 回调结果检查
@@ -53,10 +49,9 @@ public class RetryUtils {
             try {
                 v = retryCallable.call();
             } catch (Exception e) {
-                log.warn("retry on " + (i + 1) + " times v = " + (v == null ? null : v.getJson()), e);
+				e.printStackTrace();
             }
             if (null != v && v.matching()) break;
-            log.error("retry on " + (i + 1) + " times but not matching v = " + (v == null ? null : v.getJson()));
         }
         return v;
     }
@@ -78,12 +73,11 @@ public class RetryUtils {
             try {
                 v = retryCallable.call();
             } catch (Exception e) {
-                log.warn("retry on " + (i + 1) + " times v = " + (v == null ? null : v.getJson()), e);
+				e.printStackTrace();
             }
             if (null != v && v.matching()) {
                 break;
             }
-            log.error("retry on " + (i + 1) + " times but not matching v = " + (v == null ? null : v.getJson()));
             if (sleepMillis > 0) {
                 Thread.sleep(sleepMillis);
             }

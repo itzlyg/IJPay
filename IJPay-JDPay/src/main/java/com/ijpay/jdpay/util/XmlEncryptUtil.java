@@ -1,7 +1,7 @@
 package com.ijpay.jdpay.util;
 
-import cn.hutool.core.util.StrUtil;
-import org.apache.commons.codec.binary.Base64;
+import com.ijpay.core.kit.CypherKit;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class XmlEncryptUtil {
@@ -15,7 +15,7 @@ public class XmlEncryptUtil {
     public static String encrypt(String rsaPrivateKey, String strDesKey, String genSignStr) {
         System.out.println("genSignStr>" + genSignStr);
         String encrypt = null;
-        if (StrUtil.isNotEmpty(rsaPrivateKey) && StrUtil.isNotEmpty(strDesKey) && StrUtil.isNotEmpty(genSignStr)) {
+        if (StringUtils.isNotEmpty(rsaPrivateKey) && StringUtils.isNotEmpty(strDesKey) && StringUtils.isNotEmpty(genSignStr)) {
 
             try {
                 genSignStr = JdPayXmlUtil.addXmlHeadAndElJdPay(genSignStr);
@@ -28,7 +28,7 @@ public class XmlEncryptUtil {
                 System.out.println("sign>" + sign);
                 String data = genSignStr.substring(0, genSignStr.length() - XML_JDPAY_END.length()) + XML_SIGN_START + sign + XML_SIGN_END + XML_JDPAY_END;
 
-                encrypt = Base64.encodeBase64String(ThreeDesUtil.encrypt2HexStr(RsaUtil.decryptBASE64(strDesKey), data).getBytes("UTF-8"));
+                encrypt = CypherKit.encode(ThreeDesUtil.encrypt2HexStr(CypherKit.decodeToBytes(strDesKey), data).getBytes("UTF-8"));
             } catch (Exception e) {
                 throw new RuntimeException("signature failed");
             }
@@ -40,7 +40,7 @@ public class XmlEncryptUtil {
         String reqBody = "";
 
         try {
-            reqBody = ThreeDesUtil.decrypt4HexStr(RsaUtil.decryptBASE64(strDesKey), new String(Base64.decodeBase64(encrypt), "UTF-8"));
+            reqBody = ThreeDesUtil.decrypt4HexStr(CypherKit.decodeToBytes(strDesKey), CypherKit.decode(encrypt));
 
             String inputSign = JdPayXmlUtil.getXmlElm(reqBody, SIGN);
 

@@ -1,7 +1,5 @@
 package com.ijpay.jdpay;
 
-import lombok.*;
-
 import java.io.Serializable;
 
 /**
@@ -17,15 +15,9 @@ import java.io.Serializable;
  *
  * @author Javen
  */
-
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class JdPayApiConfig implements Serializable {
     private static final long serialVersionUID = -9044503427692786302L;
-    
+
     private String appId;
     private String mchId;
     private String rsaPrivateKey;
@@ -33,4 +25,60 @@ public class JdPayApiConfig implements Serializable {
     private String desKey;
     private String domain;
     private String certPath;
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getMchId() {
+		return mchId;
+	}
+
+	public void setMchId(String mchId) {
+		this.mchId = mchId;
+	}
+
+	public String getRsaPrivateKey() {
+		return rsaPrivateKey;
+	}
+
+	public void setRsaPrivateKey(String rsaPrivateKey) {
+		this.rsaPrivateKey = rsaPrivateKey;
+	}
+
+	public String getRsaPublicKey() {
+		return rsaPublicKey;
+	}
+
+	public void setRsaPublicKey(String rsaPublicKey) {
+		this.rsaPublicKey = rsaPublicKey;
+	}
+
+	public String getDesKey() {
+		return desKey;
+	}
+
+	public void setDesKey(String desKey) {
+		this.desKey = desKey;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public String getCertPath() {
+		return certPath;
+	}
+
+	public void setCertPath(String certPath) {
+		this.certPath = certPath;
+	}
 }

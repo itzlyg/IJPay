@@ -108,7 +108,7 @@ public <T extends AlipayResponse> T execute(AlipayRequest<T> request, String acc
 public static AlipayTradeCloseResponse tradeCloseToResponse(AlipayTradeCloseModel model, String appAuthToken) throws AlipayApiException {
     AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
     request.setBizModel(model);
-    if (StrUtil.isBlank(appAuthToken)) {
+    if (StringUtils.isBlank(appAuthToken)) {
         return AliPayApiConfigKit.getAliPayApiConfig().getAliPayClient().execute(request);
     } else {
         // 支持第三方代理调用

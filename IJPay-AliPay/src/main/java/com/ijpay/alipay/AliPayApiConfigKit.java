@@ -1,6 +1,6 @@
 package com.ijpay.alipay;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +43,7 @@ public class AliPayApiConfigKit {
      * @return {@link AliPayApiConfig}
      */
     public static AliPayApiConfig setThreadLocalAliPayApiConfig(AliPayApiConfig aliPayApiConfig) {
-        if (StrUtil.isNotEmpty(aliPayApiConfig.getAppId())){
+        if (StringUtils.isNotEmpty(aliPayApiConfig.getAppId())){
             setThreadLocalAppId(aliPayApiConfig.getAppId());
         }
         return putApiConfig(aliPayApiConfig);
@@ -75,7 +75,7 @@ public class AliPayApiConfigKit {
      * @param appId 支付宝应用编号
      */
     public static void setThreadLocalAppId(String appId) {
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         TL.set(appId);
@@ -95,7 +95,7 @@ public class AliPayApiConfigKit {
      */
     public static String getAppId() {
         String appId = TL.get();
-        if (StrUtil.isEmpty(appId)) {
+        if (StringUtils.isEmpty(appId)) {
             appId = CFG_MAP.get(DEFAULT_CFG_KEY).getAppId();
         }
         return appId;

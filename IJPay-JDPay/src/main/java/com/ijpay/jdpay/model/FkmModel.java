@@ -13,15 +13,6 @@
  */
 package com.ijpay.jdpay.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class FkmModel extends JdBaseModel {
     private String token;
     private String version;
@@ -45,4 +36,180 @@ public class FkmModel extends JdBaseModel {
     private String sign;
     private String riskInfo;
     private String bizTp;
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getMerchant() {
+		return merchant;
+	}
+
+	public void setMerchant(String merchant) {
+		this.merchant = merchant;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
+	public String getTradeNum() {
+		return tradeNum;
+	}
+
+	public void setTradeNum(String tradeNum) {
+		this.tradeNum = tradeNum;
+	}
+
+	public String getTradeName() {
+		return tradeName;
+	}
+
+	public void setTradeName(String tradeName) {
+		this.tradeName = tradeName;
+	}
+
+	public String getTradeDesc() {
+		return tradeDesc;
+	}
+
+	public void setTradeDesc(String tradeDesc) {
+		this.tradeDesc = tradeDesc;
+	}
+
+	public String getTradeTime() {
+		return tradeTime;
+	}
+
+	public void setTradeTime(String tradeTime) {
+		this.tradeTime = tradeTime;
+	}
+
+	public String getAmount() {
+		return amount;
+	}
+
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+
+	public String getIndustryCategoryCode() {
+		return industryCategoryCode;
+	}
+
+	public void setIndustryCategoryCode(String industryCategoryCode) {
+		this.industryCategoryCode = industryCategoryCode;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getNotifyUrl() {
+		return notifyUrl;
+	}
+
+	public void setNotifyUrl(String notifyUrl) {
+		this.notifyUrl = notifyUrl;
+	}
+
+	public String getOrderGoodsNum() {
+		return orderGoodsNum;
+	}
+
+	public void setOrderGoodsNum(String orderGoodsNum) {
+		this.orderGoodsNum = orderGoodsNum;
+	}
+
+	public String getVendorId() {
+		return vendorId;
+	}
+
+	public void setVendorId(String vendorId) {
+		this.vendorId = vendorId;
+	}
+
+	public String getGoodsInfoList() {
+		return goodsInfoList;
+	}
+
+	public void setGoodsInfoList(String goodsInfoList) {
+		this.goodsInfoList = goodsInfoList;
+	}
+
+	public String getReceiverInfo() {
+		return receiverInfo;
+	}
+
+	public void setReceiverInfo(String receiverInfo) {
+		this.receiverInfo = receiverInfo;
+	}
+
+	public String getTermInfo() {
+		return termInfo;
+	}
+
+	public void setTermInfo(String termInfo) {
+		this.termInfo = termInfo;
+	}
+
+	public String getPayMerchant() {
+		return payMerchant;
+	}
+
+	public void setPayMerchant(String payMerchant) {
+		this.payMerchant = payMerchant;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getRiskInfo() {
+		return riskInfo;
+	}
+
+	public void setRiskInfo(String riskInfo) {
+		this.riskInfo = riskInfo;
+	}
+
+	public String getBizTp() {
+		return bizTp;
+	}
+
+	public void setBizTp(String bizTp) {
+		this.bizTp = bizTp;
+	}
 }

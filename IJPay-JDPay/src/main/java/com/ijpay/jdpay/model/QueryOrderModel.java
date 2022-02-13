@@ -13,15 +13,7 @@
  */
 package com.ijpay.jdpay.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class QueryOrderModel extends JdBaseModel {
     private String version;
     private String merchant;
@@ -29,4 +21,52 @@ public class QueryOrderModel extends JdBaseModel {
     private String oTradeNum;
     private String tradeType;
     private String sign;
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getMerchant() {
+		return merchant;
+	}
+
+	public void setMerchant(String merchant) {
+		this.merchant = merchant;
+	}
+
+	public String getTradeNum() {
+		return tradeNum;
+	}
+
+	public void setTradeNum(String tradeNum) {
+		this.tradeNum = tradeNum;
+	}
+
+	public String getoTradeNum() {
+		return oTradeNum;
+	}
+
+	public void setoTradeNum(String oTradeNum) {
+		this.oTradeNum = oTradeNum;
+	}
+
+	public String getTradeType() {
+		return tradeType;
+	}
+
+	public void setTradeType(String tradeType) {
+		this.tradeType = tradeType;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
 }

@@ -14,15 +14,7 @@
 package com.ijpay.wxpay.model;
 
 import com.ijpay.core.model.BaseModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class ShortUrlModel extends BaseModel {
     private String appid;
     private String sub_appid;
@@ -32,4 +24,68 @@ public class ShortUrlModel extends BaseModel {
     private String nonce_str;
     private String sign;
     private String sign_type;
+
+	public String getAppid() {
+		return appid;
+	}
+
+	public void setAppid(String appid) {
+		this.appid = appid;
+	}
+
+	public String getSub_appid() {
+		return sub_appid;
+	}
+
+	public void setSub_appid(String sub_appid) {
+		this.sub_appid = sub_appid;
+	}
+
+	public String getMch_id() {
+		return mch_id;
+	}
+
+	public void setMch_id(String mch_id) {
+		this.mch_id = mch_id;
+	}
+
+	public String getSub_mch_id() {
+		return sub_mch_id;
+	}
+
+	public void setSub_mch_id(String sub_mch_id) {
+		this.sub_mch_id = sub_mch_id;
+	}
+
+	public String getLong_url() {
+		return long_url;
+	}
+
+	public void setLong_url(String long_url) {
+		this.long_url = long_url;
+	}
+
+	public String getNonce_str() {
+		return nonce_str;
+	}
+
+	public void setNonce_str(String nonce_str) {
+		this.nonce_str = nonce_str;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getSign_type() {
+		return sign_type;
+	}
+
+	public void setSign_type(String sign_type) {
+		this.sign_type = sign_type;
+	}
 }

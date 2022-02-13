@@ -1,10 +1,9 @@
 
 package com.ijpay.paypal.accesstoken;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.ijpay.core.utils.PayJsonUtil;
 import com.ijpay.core.utils.RetryUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -37,19 +36,20 @@ public class AccessToken implements Serializable, RetryUtils.ResultCheck {
         this.json = json;
         this.status = httpCode;
         try {
-            JSONObject jsonObject = JSONUtil.parseObj(json);
-            this.access_token = jsonObject.getStr("access_token");
-            this.expires_in = jsonObject.getInt("expires_in");
-            this.app_id = jsonObject.getStr("app_id");
-            this.token_type = jsonObject.getStr("token_type");
+            this.access_token = PayJsonUtil.key2Val(json ,"access_token");
+            this.expires_in = Integer.valueOf(PayJsonUtil.key2Val(json ,"expires_in"));
+            this.app_id = PayJsonUtil.key2Val(json ,"app_id");
+            this.token_type = PayJsonUtil.key2Val(json ,"token_type");
             if (expires_in != null) {
                 this.expiredTime = System.currentTimeMillis() + ((expires_in - 9) * 1000);
             }
-            if (jsonObject.containsKey("expiredTime")) {
-                this.expiredTime = jsonObject.getLong("expiredTime");
-            }
-            if (jsonObject.containsKey("status")) {
-                this.status = jsonObject.getInt("status");
+			String st = PayJsonUtil.key2Val(json , "expiredTime");
+			if (StringUtils.isNotBlank(st)) {
+				this.expiredTime = Long.valueOf(st);
+			}
+			st = PayJsonUtil.key2Val(json , "status");
+            if (StringUtils.isNotBlank(st)) {
+                this.status = Integer.valueOf(st);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -66,16 +66,16 @@ public class AccessToken implements Serializable, RetryUtils.ResultCheck {
         if (expiredTime < System.currentTimeMillis()) {
             return false;
         }
-        return StrUtil.isNotEmpty(access_token);
+        return StringUtils.isNotEmpty(access_token);
     }
 
     public String getCacheJson() {
-        Map<String, Object> temp = JSONUtil.toBean(json, Map.class);
+        Map<String, Object> temp = PayJsonUtil.toPojo(json, Map.class);
         temp.put("expiredTime", expiredTime);
         temp.remove("expires_in");
         temp.remove("scope");
         temp.remove("nonce");
-        return JSONUtil.toJsonStr(temp);
+        return PayJsonUtil.toJson(temp);
     }
 
     public String getAccessToken() {

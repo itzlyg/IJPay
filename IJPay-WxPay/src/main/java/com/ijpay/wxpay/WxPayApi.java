@@ -1,7 +1,5 @@
 package com.ijpay.wxpay;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.ContentType;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.enums.PayModel;
 import com.ijpay.core.enums.RequestMethod;
@@ -11,6 +9,7 @@ import com.ijpay.core.kit.PayKit;
 import com.ijpay.core.kit.WxPayKit;
 import com.ijpay.wxpay.enums.WxApiType;
 import com.ijpay.wxpay.enums.WxDomain;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -124,9 +123,9 @@ public class WxPayApi {
      * @param protocol 协议
      * @return {@link String} 请求返回的结果
      */
-    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String certPass, String protocol) {
-        return doPostSslByProtocol(apiUrl, params, certPath, certPass, protocol);
-    }
+//    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return doPostSslByProtocol(apiUrl, params, certPath, certPass, protocol);
+//    }
 
     /**
      * 发起请求
@@ -153,9 +152,9 @@ public class WxPayApi {
      * @param protocol 协议
      * @return {@link String} 请求返回的结果
      */
-    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String protocol) {
-        return doPostSslByProtocol(apiUrl, params, certPath, protocol);
-    }
+//    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String protocol) {
+//        return doPostSslByProtocol(apiUrl, params, certPath, protocol);
+//    }
 
     /**
      * 发起请求
@@ -184,9 +183,9 @@ public class WxPayApi {
      * @param protocol 协议
      * @return {@link String} 请求返回的结果
      */
-    public static String executionByProtocol(String apiUrl, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return doPostSslByProtocol(apiUrl, params, certFile, certPass, protocol);
-    }
+//    public static String executionByProtocol(String apiUrl, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return doPostSslByProtocol(apiUrl, params, certFile, certPass, protocol);
+//    }
 
     /**
      * 发起请求
@@ -213,18 +212,18 @@ public class WxPayApi {
      * @param protocol 协议
      * @return {@link String} 请求返回的结果
      */
-    public static String executionByProtocol(String apiUrl, Map<String, String> params, InputStream certFile, String protocol) {
-        return doPostSslByProtocol(apiUrl, params, certFile, protocol);
-    }
-
-    public static String execution(String apiUrl, Map<String, String> params,
-                                   String certPath, String certPass, String filePath) {
-        return doUploadSsl(apiUrl, params, certPath, certPass, filePath);
-    }
-
-    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String certPass, String filePath, String protocol) {
-        return doUploadSslByProtocol(apiUrl, params, certPath, certPass, filePath, protocol);
-    }
+//    public static String executionByProtocol(String apiUrl, Map<String, String> params, InputStream certFile, String protocol) {
+//        return doPostSslByProtocol(apiUrl, params, certFile, protocol);
+//    }
+//
+//    public static String execution(String apiUrl, Map<String, String> params,
+//                                   String certPath, String certPass, String filePath) {
+//        return doUploadSsl(apiUrl, params, certPath, certPass, filePath);
+//    }
+//
+//    public static String executionByProtocol(String apiUrl, Map<String, String> params, String certPath, String certPass, String filePath, String protocol) {
+//        return doUploadSslByProtocol(apiUrl, params, certPath, certPass, filePath, protocol);
+//    }
 
 
     /**
@@ -253,7 +252,7 @@ public class WxPayApi {
         String authorization = WxPayKit.buildAuthorization(method, urlSuffix, mchId, serialNo,
                 keyPath, body, nonceStr, timestamp, authType);
 
-        if (StrUtil.isEmpty(platSerialNo)) {
+        if (StringUtils.isEmpty(platSerialNo)) {
             platSerialNo = serialNo;
         }
 
@@ -262,11 +261,11 @@ public class WxPayApi {
         } else if (method == RequestMethod.POST) {
             return post(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         } else if (method == RequestMethod.DELETE) {
-            return delete(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
+//            return delete(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         } else if (method == RequestMethod.UPLOAD) {
             return upload(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body, file);
         } else if (method == RequestMethod.PUT) {
-            return put(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
+//            return put(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         }
         return null;
     }
@@ -297,7 +296,7 @@ public class WxPayApi {
         String authorization = WxPayKit.buildAuthorization(method, urlSuffix, mchId, serialNo,
                 privateKey, body, nonceStr, timestamp, authType);
 
-        if (StrUtil.isEmpty(platSerialNo)) {
+        if (StringUtils.isEmpty(platSerialNo)) {
             platSerialNo = serialNo;
         }
 
@@ -306,11 +305,11 @@ public class WxPayApi {
         } else if (method == RequestMethod.POST) {
             return post(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         } else if (method == RequestMethod.DELETE) {
-            return delete(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
+//            return delete(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         } else if (method == RequestMethod.UPLOAD) {
             return upload(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body, file);
         } else if (method == RequestMethod.PUT) {
-            return put(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
+//            return put(urlPrefix.concat(urlSuffix), authorization, platSerialNo, body);
         }
         return null;
     }
@@ -611,7 +610,7 @@ public class WxPayApi {
      * @return {@link String} 请求返回的结果
      */
     public static String getSignKey(String mchId, String partnerKey, SignType signType) {
-        Map<String, String> map = new HashMap<>(3);
+        Map<String, String> map = new HashMap<>();
         String nonceStr = WxPayKit.generateStr();
         map.put("mch_id", mchId);
         map.put("nonce_str", nonceStr);
@@ -731,18 +730,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certPath, certPass);
     }
 
-    /**
-     * 申请退款
-     *
-     * @param isSandbox 是否是沙盒环境
-     * @param params    请求参数
-     * @param certPath  证书文件路径
-     * @param certPass  证书密码
-     * @return {@link String} 请求返回的结果
-     */
-    public static String orderRefundByProtocol(boolean isSandbox, Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 申请退款
+//     *
+//     * @param isSandbox 是否是沙盒环境
+//     * @param params    请求参数
+//     * @param certPath  证书文件路径
+//     * @param certPass  证书密码
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String orderRefundByProtocol(boolean isSandbox, Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 申请退款
@@ -757,18 +756,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certFile, certPass);
     }
 
-    /**
-     * 申请退款
-     *
-     * @param isSandbox 是否是沙盒环境
-     * @param params    请求参数
-     * @param certFile  证书文件的 InputStream
-     * @param certPass  证书密码
-     * @return {@link String} 请求返回的结果
-     */
-    public static String orderRefundByProtocol(boolean isSandbox, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 申请退款
+//     *
+//     * @param isSandbox 是否是沙盒环境
+//     * @param params    请求参数
+//     * @param certFile  证书文件的 InputStream
+//     * @param certPass  证书密码
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String orderRefundByProtocol(boolean isSandbox, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.REFUND, null, isSandbox), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询退款
@@ -845,18 +844,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.TRANSFER, null, false), params, certPath, certPass);
     }
 
-    /**
-     * 企业付款到零钱
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String transfersByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.TRANSFER, null, false), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 企业付款到零钱
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String transfersByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.TRANSFER, null, false), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 企业付款到零钱
@@ -870,18 +869,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.TRANSFER, null, false), params, certFile, certPass);
     }
 
-    /**
-     * 企业付款到零钱
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String transfersByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.TRANSFER, null, false), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 企业付款到零钱
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String transfersByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.TRANSFER, null, false), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询企业付款到零钱
@@ -919,18 +918,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certPath, certPass);
     }
 
-    /**
-     * 企业付款到银行
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String payBankByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 企业付款到银行
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String payBankByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 企业付款到银行
@@ -944,18 +943,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certFile, certPass);
     }
 
-    /**
-     * 企业付款到银行
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String payBankByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 企业付款到银行
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String payBankByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.TRANSFER_BANK, null, false), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询企业付款到银行
@@ -1542,18 +1541,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_RED_PACK), params, certPath, certPass);
     }
 
-    /**
-     * 发放普通红包
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_RED_PACK), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 发放普通红包
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_RED_PACK), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 发放普通红包
@@ -1567,18 +1566,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_RED_PACK), params, certFile, certPass);
     }
 
-    /**
-     * 发放普通红包
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_RED_PACK), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 发放普通红包
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_RED_PACK), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 发放裂变红包
@@ -1592,18 +1591,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certPath, certPass);
     }
 
-    /**
-     * 发放裂变红包
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendGroupRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 发放裂变红包
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendGroupRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 发放裂变红包
@@ -1617,18 +1616,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certFile, certPass);
     }
 
-    /**
-     * 发放裂变红包
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendGroupRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 发放裂变红包
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendGroupRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_GROUP_RED_PACK), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询红包记录
@@ -1666,18 +1665,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certPath, certPass);
     }
 
-    /**
-     * 小程序发放红包接口
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendMiniProgramRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 小程序发放红包接口
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendMiniProgramRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 小程序发放红包接口
@@ -1691,18 +1690,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certFile, certPass);
     }
 
-    /**
-     * 小程序发放红包接口
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendMiniProgramRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 小程序发放红包接口
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendMiniProgramRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_MINI_PROGRAM_HB), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 发放企业红包
@@ -1716,18 +1715,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certPath, certPass);
     }
 
-    /**
-     * 发放企业红包
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendWorkWxRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 发放企业红包
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendWorkWxRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 发放企业红包
@@ -1741,18 +1740,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certFile, certPass);
     }
 
-    /**
-     * 发放企业红包
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String sendWorkWxRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 发放企业红包
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String sendWorkWxRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.SEND_WORK_WX_RED_PACK), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询向员工付款记录
@@ -1766,18 +1765,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certPath, certPass);
     }
 
-    /**
-     * 查询向员工付款记录
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String queryWorkWxRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 查询向员工付款记录
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String queryWorkWxRedPackByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 查询向员工付款记录
@@ -1791,18 +1790,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certFile, certPass);
     }
 
-    /**
-     * 查询向员工付款记录
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String queryWorkWxRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 查询向员工付款记录
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String queryWorkWxRedPackByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.QUERY_WORK_WX_RED_PACK), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 向员工付款
@@ -1816,18 +1815,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certPath, certPass);
     }
 
-    /**
-     * 向员工付款
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String trans2pocketByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 向员工付款
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String trans2pocketByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 向员工付款
@@ -1841,18 +1840,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certFile, certPass);
     }
 
-    /**
-     * 向员工付款
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String trans2pocketByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 向员工付款
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String trans2pocketByProtocol(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.PAY_WWS_TRANS_2_POCKET), params, certFile, certPass, protocol);
+//    }
 
     /**
      * 查询向员工付款记录
@@ -1866,18 +1865,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certPath, certPass);
     }
 
-    /**
-     * 查询向员工付款记录
-     *
-     * @param params   请求参数
-     * @param certPath 证书文件路径
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String queryTrans2pocketByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certPath, certPass, protocol);
-    }
+//    /**
+//     * 查询向员工付款记录
+//     *
+//     * @param params   请求参数
+//     * @param certPath 证书文件路径
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String queryTrans2pocketByProtocol(Map<String, String> params, String certPath, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certPath, certPass, protocol);
+//    }
 
     /**
      * 查询向员工付款记录
@@ -1891,18 +1890,18 @@ public class WxPayApi {
         return execution(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certFile, certPass);
     }
 
-    /**
-     * 查询向员工付款记录
-     *
-     * @param params   请求参数
-     * @param certFile 证书文件的 InputStream
-     * @param certPass 证书密码
-     * @param protocol 协议
-     * @return {@link String} 请求返回的结果
-     */
-    public static String queryTrans2pocket(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return executionByProtocol(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certFile, certPass, protocol);
-    }
+//    /**
+//     * 查询向员工付款记录
+//     *
+//     * @param params   请求参数
+//     * @param certFile 证书文件的 InputStream
+//     * @param certPass 证书密码
+//     * @param protocol 协议
+//     * @return {@link String} 请求返回的结果
+//     */
+//    public static String queryTrans2pocket(Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return executionByProtocol(getReqUrl(WxApiType.QUERY_WWS_TRANS_2_POCKET), params, certFile, certPass, protocol);
+//    }
 
     /**
      * @param url    请求url
@@ -1910,7 +1909,7 @@ public class WxPayApi {
      * @return {@link String}    请求返回的结果
      */
     public static String doGet(String url, Map<String, Object> params) {
-        return HttpKit.getDelegate().get(url, params);
+        return HttpKit.get(url, params);
     }
 
     /**
@@ -1922,7 +1921,7 @@ public class WxPayApi {
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
     public static IJPayHttpResponse get(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().get(url, params, headers);
+        return HttpKit.get(url, params, headers);
     }
 
     /**
@@ -1947,7 +1946,7 @@ public class WxPayApi {
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
     public static IJPayHttpResponse post(String url, String data, Map<String, String> headers) {
-        return HttpKit.getDelegate().post(url, data, headers);
+        return HttpKit.post(url, data, headers);
     }
 
     /**
@@ -1971,9 +1970,9 @@ public class WxPayApi {
      * @param headers 请求头
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
-    public static IJPayHttpResponse delete(String url, String data, Map<String, String> headers) {
-        return HttpKit.getDelegate().delete(url, data, headers);
-    }
+//    public static IJPayHttpResponse delete(String url, String data, Map<String, String> headers) {
+//        return HttpKit.delete(url, data, headers);
+//    }
 
     /**
      * delete 请求
@@ -1984,9 +1983,9 @@ public class WxPayApi {
      * @param data          请求参数
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
-    public static IJPayHttpResponse delete(String url, String authorization, String serialNumber, String data) {
-        return delete(url, data, getHeaders(authorization, serialNumber));
-    }
+//    public static IJPayHttpResponse delete(String url, String authorization, String serialNumber, String data) {
+//        return delete(url, data, getHeaders(authorization, serialNumber));
+//    }
 
     /**
      * upload 请求
@@ -1997,7 +1996,7 @@ public class WxPayApi {
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
     public static IJPayHttpResponse upload(String url, Map<String, Object> params, Map<String, String> headers) {
-        return HttpKit.getDelegate().post(url, params, headers);
+        return HttpKit.post(url, params, headers);
     }
 
     /**
@@ -2011,57 +2010,57 @@ public class WxPayApi {
      * @return {@link IJPayHttpResponse}    请求返回的结果
      */
     public static IJPayHttpResponse upload(String url, String authorization, String serialNumber, String data, File file) {
-        Map<String, Object> paramMap = new HashMap<>(2);
+        Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("file", file);
         paramMap.put("meta", data);
         return upload(url, paramMap, getUploadHeaders(authorization, serialNumber));
     }
 
 
-    /**
-     * put 请求
-     *
-     * @param url     请求url
-     * @param data    请求参数
-     * @param headers 请求头
-     * @return {@link IJPayHttpResponse}    请求返回的结果
-     */
-    public static IJPayHttpResponse put(String url, String data, Map<String, String> headers) {
-        return HttpKit.getDelegate().put(url, data, headers);
-    }
+//    /**
+//     * put 请求
+//     *
+//     * @param url     请求url
+//     * @param data    请求参数
+//     * @param headers 请求头
+//     * @return {@link IJPayHttpResponse}    请求返回的结果
+//     */
+//    public static IJPayHttpResponse put(String url, String data, Map<String, String> headers) {
+//        return HttpKit.put(url, data, headers);
+//    }
 
-    /**
-     * put 请求
-     *
-     * @param url           请求url
-     * @param authorization 授权信息
-     * @param serialNumber  公钥证书序列号
-     * @param data          请求参数
-     * @return {@link IJPayHttpResponse}    请求返回的结果
-     */
-    public static IJPayHttpResponse put(String url, String authorization, String serialNumber, String data) {
-        return put(url, data, getHeaders(authorization, serialNumber));
-    }
+//    /**
+//     * put 请求
+//     *
+//     * @param url           请求url
+//     * @param authorization 授权信息
+//     * @param serialNumber  公钥证书序列号
+//     * @param data          请求参数
+//     * @return {@link IJPayHttpResponse}    请求返回的结果
+//     */
+//    public static IJPayHttpResponse put(String url, String authorization, String serialNumber, String data) {
+//        return put(url, data, getHeaders(authorization, serialNumber));
+//    }
 
     public static String doPost(String url, Map<String, String> params) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params));
+        return HttpKit.post(url, WxPayKit.toXml(params));
     }
 
     public static String doPostSsl(String url, Map<String, String> params, String certPath, String certPass) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certPath, certPass);
+        return HttpKit.post(url, WxPayKit.toXml(params), certPath, certPass);
     }
 
     public static String doPostSslByProtocol(String url, Map<String, String> params, String certPath, String certPass, String protocol) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certPath, certPass, protocol);
+        return HttpKit.post(url, WxPayKit.toXml(params), certPath, certPass, protocol);
     }
 
     public static String doPostSsl(String url, Map<String, String> params, InputStream certFile, String certPass) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certFile, certPass);
+        return HttpKit.post(url, WxPayKit.toXml(params), certFile, certPass);
     }
 
-    public static String doPostSslByProtocol(String url, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
-        return HttpKit.getDelegate().post(url, WxPayKit.toXml(params), certFile, certPass, protocol);
-    }
+//    public static String doPostSslByProtocol(String url, Map<String, String> params, InputStream certFile, String certPass, String protocol) {
+//        return HttpKit.post(url, WxPayKit.toXml(params), certFile, certPass, protocol);
+//    }
 
     public static String doPostSsl(String url, Map<String, String> params, String certPath) {
         if (params.isEmpty() || !params.containsKey("mch_id")) {
@@ -2071,13 +2070,13 @@ public class WxPayApi {
         return doPostSsl(url, params, certPath, certPass);
     }
 
-    public static String doPostSslByProtocol(String url, Map<String, String> params, String certPath, String protocol) {
-        if (params.isEmpty() || !params.containsKey("mch_id")) {
-            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
-        }
-        String certPass = params.get("mch_id");
-        return doPostSslByProtocol(url, params, certPath, certPass, protocol);
-    }
+//    public static String doPostSslByProtocol(String url, Map<String, String> params, String certPath, String protocol) {
+//        if (params.isEmpty() || !params.containsKey("mch_id")) {
+//            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
+//        }
+//        String certPass = params.get("mch_id");
+//        return doPostSslByProtocol(url, params, certPath, certPass, protocol);
+//    }
 
     public static String doPostSsl(String url, Map<String, String> params, InputStream certFile) {
         if (params.isEmpty() || !params.containsKey("mch_id")) {
@@ -2087,37 +2086,37 @@ public class WxPayApi {
         return doPostSsl(url, params, certFile, certPass);
     }
 
-    public static String doPostSslByProtocol(String url, Map<String, String> params, InputStream certFile, String protocol) {
-        if (params.isEmpty() || !params.containsKey("mch_id")) {
-            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
-        }
-        String certPass = params.get("mch_id");
-        return doPostSslByProtocol(url, params, certFile, certPass, protocol);
-    }
+//    public static String doPostSslByProtocol(String url, Map<String, String> params, InputStream certFile, String protocol) {
+//        if (params.isEmpty() || !params.containsKey("mch_id")) {
+//            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
+//        }
+//        String certPass = params.get("mch_id");
+//        return doPostSslByProtocol(url, params, certFile, certPass, protocol);
+//    }
 
-    public static String doUploadSsl(String url, Map<String, String> params, String certPath, String certPass, String filePath) {
-        return HttpKit.getDelegate().upload(url, WxPayKit.toXml(params), certPath, certPass, filePath);
-    }
+//    public static String doUploadSsl(String url, Map<String, String> params, String certPath, String certPass, String filePath) {
+//        return HttpKit.upload(url, WxPayKit.toXml(params), certPath, certPass, filePath);
+//    }
+//
+//    public static String doUploadSslByProtocol(String url, Map<String, String> params, String certPath, String certPass, String filePath, String protocol) {
+//        return HttpKit.upload(url, WxPayKit.toXml(params), certPath, certPass, filePath, protocol);
+//    }
 
-    public static String doUploadSslByProtocol(String url, Map<String, String> params, String certPath, String certPass, String filePath, String protocol) {
-        return HttpKit.getDelegate().upload(url, WxPayKit.toXml(params), certPath, certPass, filePath, protocol);
-    }
+//    public static String doUploadSsl(String url, Map<String, String> params, String certPath, String filePath) {
+//        if (params.isEmpty() || !params.containsKey("mch_id")) {
+//            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
+//        }
+//        String certPass = params.get("mch_id");
+//        return doUploadSsl(url, params, certPath, certPass, filePath);
+//    }
 
-    public static String doUploadSsl(String url, Map<String, String> params, String certPath, String filePath) {
-        if (params.isEmpty() || !params.containsKey("mch_id")) {
-            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
-        }
-        String certPass = params.get("mch_id");
-        return doUploadSsl(url, params, certPath, certPass, filePath);
-    }
-
-    public static String doUploadSslByProtocol(String url, Map<String, String> params, String certPath, String filePath, String protocol) {
-        if (params.isEmpty() || !params.containsKey("mch_id")) {
-            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
-        }
-        String certPass = params.get("mch_id");
-        return doUploadSslByProtocol(url, params, certPath, certPass, filePath, protocol);
-    }
+//    public static String doUploadSslByProtocol(String url, Map<String, String> params, String certPath, String filePath, String protocol) {
+//        if (params.isEmpty() || !params.containsKey("mch_id")) {
+//            throw new RuntimeException("请求参数中必须包含 mch_id，如接口参考中不包 mch_id， 请使用其他同名构造方法。");
+//        }
+//        String certPass = params.get("mch_id");
+//        return doUploadSslByProtocol(url, params, certPath, certPass, filePath, protocol);
+//    }
 
 
     private static final String OS = System.getProperty("os.name") + "/" + System.getProperty("os.version");
@@ -2130,8 +2129,8 @@ public class WxPayApi {
                 OS,
                 VERSION == null ? "Unknown" : VERSION);
 
-        Map<String, String> headers = new HashMap<>(5);
-        headers.put("Accept", ContentType.JSON.toString());
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json");
         headers.put("Authorization", authorization);
         headers.put("User-Agent", userAgent);
         return headers;
@@ -2139,8 +2138,8 @@ public class WxPayApi {
 
     public static Map<String, String> getHeaders(String authorization, String serialNumber) {
         Map<String, String> headers = getBaseHeaders(authorization);
-        headers.put("Content-Type", ContentType.JSON.toString());
-        if (StrUtil.isNotEmpty(serialNumber)) {
+        headers.put("Content-Type", "application/json");
+        if (StringUtils.isNotEmpty(serialNumber)) {
             headers.put("Wechatpay-Serial", serialNumber);
         }
         return headers;
@@ -2149,7 +2148,7 @@ public class WxPayApi {
     public static Map<String, String> getUploadHeaders(String authorization, String serialNumber) {
         Map<String, String> headers = getBaseHeaders(authorization);
         headers.put("Content-Type", "multipart/form-data;boundary=\"boundary\"");
-        if (StrUtil.isNotEmpty(serialNumber)) {
+        if (StringUtils.isNotEmpty(serialNumber)) {
             headers.put("Wechatpay-Serial", serialNumber);
         }
         return headers;
@@ -2165,7 +2164,7 @@ public class WxPayApi {
         if (response == null) {
             return null;
         }
-        Map<String, Object> map = new HashMap<>(6);
+        Map<String, Object> map = new HashMap<>();
         String timestamp = response.getHeader("Wechatpay-Timestamp");
         String nonceStr = response.getHeader("Wechatpay-Nonce");
         String serialNo = response.getHeader("Wechatpay-Serial");

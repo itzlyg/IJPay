@@ -15,12 +15,7 @@ package com.ijpay.unionpay.model;
 
 
 import com.ijpay.core.model.BaseModel;
-import lombok.*;
 
-@Builder
-@AllArgsConstructor
-@Getter
-@Setter
 public class ApplyModel extends BaseModel {
     /**
      * 合作伙伴 ID 即机构号
@@ -50,4 +45,60 @@ public class ApplyModel extends BaseModel {
      * 数据签名
      */
     private String dataSign;
+
+	public String getPartner() {
+		return partner;
+	}
+
+	public void setPartner(String partner) {
+		this.partner = partner;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getSignType() {
+		return signType;
+	}
+
+	public void setSignType(String signType) {
+		this.signType = signType;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	public String getDataSign() {
+		return dataSign;
+	}
+
+	public void setDataSign(String dataSign) {
+		this.dataSign = dataSign;
+	}
 }

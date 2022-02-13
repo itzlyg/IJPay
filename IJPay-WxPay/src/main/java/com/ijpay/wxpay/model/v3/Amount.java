@@ -1,7 +1,5 @@
 package com.ijpay.wxpay.model.v3;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
@@ -16,8 +14,6 @@ import lombok.experimental.Accessors;
  *
  * @author Javen
  */
-@Data
-@Accessors(chain = true)
 public class Amount {
     /**
      * 总金额
@@ -27,4 +23,28 @@ public class Amount {
      * 货币类型
      */
     private String currency;
+
+	public Amount (){
+
+	}
+
+	public Amount(int total){
+		this.total = total;
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 }

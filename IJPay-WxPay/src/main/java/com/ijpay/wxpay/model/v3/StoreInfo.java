@@ -1,8 +1,5 @@
 package com.ijpay.wxpay.model.v3;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
  *
@@ -16,8 +13,6 @@ import lombok.experimental.Accessors;
  *
  * @author Javen
  */
-@Data
-@Accessors(chain = true)
 public class StoreInfo {
     /**
      * 门店编号
@@ -35,4 +30,36 @@ public class StoreInfo {
      * 详细地址
      */
     private String address;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getArea_code() {
+		return area_code;
+	}
+
+	public void setArea_code(String area_code) {
+		this.area_code = area_code;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 }

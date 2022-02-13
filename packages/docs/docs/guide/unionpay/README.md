@@ -29,7 +29,7 @@ public AjaxResult microPay(HttpServletRequest request, HttpServletResponse respo
         String totalFee = request.getParameter("totalFee");
 
         String ip = IpKit.getRealIp(request);
-        if (StrKit.isBlank(ip)) {
+        if (StringUtils.isBlank(ip)) {
             ip = "127.0.0.1";
         }
         // 构建请求参数

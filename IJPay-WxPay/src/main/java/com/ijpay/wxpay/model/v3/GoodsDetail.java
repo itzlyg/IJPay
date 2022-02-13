@@ -1,8 +1,5 @@
 package com.ijpay.wxpay.model.v3;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
  *
@@ -16,8 +13,6 @@ import lombok.experimental.Accessors;
  *
  * @author Javen
  */
-@Data
-@Accessors(chain = true)
 public class GoodsDetail {
     /**
      * 商户侧商品编码
@@ -39,4 +34,44 @@ public class GoodsDetail {
      * 商品单价
      */
     private int unit_price;
+
+	public String getMerchant_goods_id() {
+		return merchant_goods_id;
+	}
+
+	public void setMerchant_goods_id(String merchant_goods_id) {
+		this.merchant_goods_id = merchant_goods_id;
+	}
+
+	public String getWechatpay_goods_id() {
+		return wechatpay_goods_id;
+	}
+
+	public void setWechatpay_goods_id(String wechatpay_goods_id) {
+		this.wechatpay_goods_id = wechatpay_goods_id;
+	}
+
+	public String getGoods_name() {
+		return goods_name;
+	}
+
+	public void setGoods_name(String goods_name) {
+		this.goods_name = goods_name;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public int getUnit_price() {
+		return unit_price;
+	}
+
+	public void setUnit_price(int unit_price) {
+		this.unit_price = unit_price;
+	}
 }

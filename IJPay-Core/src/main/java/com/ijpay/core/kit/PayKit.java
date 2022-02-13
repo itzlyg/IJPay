@@ -1,32 +1,35 @@
 package com.ijpay.core.kit;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ClassPathResource;
-import cn.hutool.core.io.resource.Resource;
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.HmacAlgorithm;
 import com.ijpay.core.XmlHelper;
 import com.ijpay.core.enums.RequestMethod;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.*;
-import java.util.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
@@ -43,16 +46,6 @@ import java.util.*;
  */
 public class PayKit {
 
-    /**
-     * 生成16进制的 sha256 字符串
-     *
-     * @param data 数据
-     * @param key  密钥
-     * @return sha256 字符串
-     */
-    public static String hmacSha256(String data, String key) {
-        return SecureUtil.hmac(HmacAlgorithm.HmacSHA256, key).digestHex(data);
-    }
 
     /**
      * SHA1加密文件，生成16进制SHA1字符串<br>
@@ -60,9 +53,9 @@ public class PayKit {
      * @param dataFile 被加密文件
      * @return SHA1 字符串
      */
-    public static String sha1(File dataFile) {
-        return SecureUtil.sha1(dataFile);
-    }
+//    public static String sha1(File dataFile) {
+//        return DigestUtils.sha1Hex(dataFile);
+//    }
 
     /**
      * SHA1加密，生成16进制SHA1字符串<br>
@@ -71,8 +64,13 @@ public class PayKit {
      * @return SHA1 字符串
      */
     public static String sha1(InputStream data) {
-        return SecureUtil.sha1(data);
-    }
+		try {
+			return DigestUtils.sha1Hex(data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
     /**
      * SHA1加密，生成16进制SHA1字符串<br>
@@ -81,40 +79,9 @@ public class PayKit {
      * @return SHA1 字符串
      */
     public static String sha1(String data) {
-        return SecureUtil.sha1(data);
+        return DigestUtils.sha1Hex(data);
     }
 
-    /**
-     * 生成16进制 MD5 字符串
-     *
-     * @param data 数据
-     * @return MD5 字符串
-     */
-    public static String md5(String data) {
-        return SecureUtil.md5(data);
-    }
-
-    /**
-     * AES 解密
-     *
-     * @param base64Data 需要解密的数据
-     * @param key        密钥
-     * @return 解密后的数据
-     */
-    public static String decryptData(String base64Data, String key) {
-        return SecureUtil.aes(md5(key).toLowerCase().getBytes()).decryptStr(base64Data);
-    }
-
-    /**
-     * AES 加密
-     *
-     * @param data 需要加密的数据
-     * @param key  密钥
-     * @return 加密后的数据
-     */
-    public static String encryptData(String data, String key) {
-        return SecureUtil.aes(md5(key).toLowerCase().getBytes()).encryptBase64(data.getBytes());
-    }
 
     /**
      * 简化的UUID，去掉了横线，使用性能更好的 ThreadLocalRandom 生成UUID
@@ -122,19 +89,20 @@ public class PayKit {
      * @return 简化的 UUID，去掉了横线
      */
     public static String generateStr() {
-        return IdUtil.fastSimpleUUID();
+//		ThreadLocalRandom random
+		return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    /**
-     * 雪花算法
-     *
-     * @param workerId     终端ID
-     * @param dataCenterId 数据中心ID
-     * @return {@link Snowflake}
-     */
-    public static Snowflake getSnowflake(long workerId, long dataCenterId) {
-        return IdUtil.getSnowflake(workerId, dataCenterId);
-    }
+//    /**
+//     * 雪花算法
+//     *
+//     * @param workerId     终端ID
+//     * @param dataCenterId 数据中心ID
+//     * @return {@link Snowflake}
+//     */
+//    public static Snowflake getSnowflake(long workerId, long dataCenterId) {
+//        return IdUtil.getSnowflake(workerId, dataCenterId);
+//    }
 
     /**
      * 把所有元素排序
@@ -199,8 +167,8 @@ public class PayKit {
      */
     public static String urlEncode(String src) {
         try {
-            return URLEncoder.encode(src, CharsetUtil.UTF_8).replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
+            return URLEncoder.encode(src, Charset.defaultCharset()).replace("+", "%20");
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -216,21 +184,21 @@ public class PayKit {
      */
     public static StringBuffer forEachMap(Map<String, String> params, String prefix, String suffix) {
         StringBuffer xml = new StringBuffer();
-        if (StrUtil.isNotEmpty(prefix)) {
+        if (StringUtils.isNotEmpty(prefix)) {
             xml.append(prefix);
         }
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             // 略过空值
-            if (StrUtil.isEmpty(value)) {
+            if (StringUtils.isEmpty(value)) {
                 continue;
             }
             xml.append("<").append(key).append(">");
             xml.append(entry.getValue());
             xml.append("</").append(key).append(">");
         }
-        if (StrUtil.isNotEmpty(suffix)) {
+        if (StringUtils.isNotEmpty(suffix)) {
             xml.append(suffix);
         }
         return xml;
@@ -345,7 +313,7 @@ public class PayKit {
      * @throws Exception 异常信息
      */
     public static String createSign(String signMessage, String keyPath) throws Exception {
-        if (StrUtil.isEmpty(signMessage)) {
+        if (StringUtils.isEmpty(signMessage)) {
             return null;
         }
         // 获取商户私钥
@@ -363,7 +331,7 @@ public class PayKit {
      * @throws Exception 异常信息
      */
     public static String createSign(String signMessage, PrivateKey privateKey) throws Exception {
-        if (StrUtil.isEmpty(signMessage)) {
+        if (StringUtils.isEmpty(signMessage)) {
             return null;
         }
         // 生成签名
@@ -382,7 +350,7 @@ public class PayKit {
      * @return 请求头 Authorization
      */
     public static String getAuthorization(String mchId, String serialNo, String nonceStr, String timestamp, String signature, String authType) {
-        Map<String, String> params = new HashMap<>(5);
+        Map<String, String> params = new HashMap<>();
         params.put("mchid", mchId);
         params.put("serial_no", serialNo);
         params.put("nonce_str", nonceStr);
@@ -410,8 +378,18 @@ public class PayKit {
      * @throws Exception 异常信息
      */
     public static PrivateKey getPrivateKey(String keyPath) throws Exception {
-        String originalKey = FileUtil.readUtf8String(keyPath);
-        return getPrivateKeyByKeyContent(originalKey);
+		StringBuilder str = new StringBuilder();
+		try (
+			 BufferedReader reader = new BufferedReader(new FileReader(keyPath))
+		) {
+			String temp;
+			while ((temp = reader.readLine()) != null) {
+				str.append(temp);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return getPrivateKeyByKeyContent(str.toString());
     }
 
     /**
@@ -465,7 +443,7 @@ public class PayKit {
 
             byte[] dataByte = data.getBytes(StandardCharsets.UTF_8);
             byte[] cipherData = cipher.doFinal(dataByte);
-            return Base64.encode(cipherData);
+            return CypherKit.encode(cipherData);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException("当前Java环境不支持RSA v1.5/OAEP", e);
         } catch (InvalidKeyException e) {
@@ -487,7 +465,7 @@ public class PayKit {
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            byte[] data = Base64.decode(cipherText);
+            byte[] data = CypherKit.decodeToBytes(cipherText);
             return new String(cipher.doFinal(data), StandardCharsets.UTF_8);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("当前Java环境不支持RSA v1.5/OAEP", e);
@@ -496,26 +474,5 @@ public class PayKit {
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new BadPaddingException("解密失败");
         }
-    }
-
-    /**
-     * 传入 classPath 静态资源路径返回文件输入流
-     *
-     * @param classPath 静态资源路径
-     * @return InputStream
-     */
-    public static InputStream getFileToStream(String classPath) {
-        Resource resource = new ClassPathResource(classPath);
-        return resource.getStream();
-    }
-
-    /**
-     * 传入 classPath 静态资源路径返回绝对路径
-     *
-     * @param classPath 静态资源路径
-     * @return 绝对路径
-     */
-    public static String getAbsolutePath(String classPath) {
-        return new ClassPathResource(classPath).getAbsolutePath();
     }
 }

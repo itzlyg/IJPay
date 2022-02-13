@@ -1,16 +1,25 @@
 package com.ijpay.core.kit;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +68,7 @@ public class RsaKit {
         String publicKeyStr = getPublicKeyStr(publicKey);
         String privateKeyStr = getPrivateKeyStr(privateKey);
 
-        Map<String, String> map = new HashMap<String, String>(2);
+        Map<String, String> map = new HashMap<>();
         map.put("publicKey", publicKeyStr);
         map.put("privateKey", privateKeyStr);
 
@@ -147,7 +156,7 @@ public class RsaKit {
      */
     public static String encryptByPublicKey(String data, String publicKey, String fillMode) throws Exception {
         byte[] dataByte = data.getBytes(StandardCharsets.UTF_8);
-        byte[] keyBytes = Base64.decode(publicKey);
+        byte[] keyBytes = CypherKit.decodeToBytes(publicKey);
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key key = keyFactory.generatePublic(x509KeySpec);
@@ -172,7 +181,7 @@ public class RsaKit {
         }
         byte[] encryptedData = out.toByteArray();
         out.close();
-        return StrUtil.str(Base64.encode(encryptedData));
+        return CypherKit.encode(encryptedData);
     }
 
     /**
@@ -184,15 +193,15 @@ public class RsaKit {
      * @throws Exception 异常信息
      */
     public static String encryptByPrivateKey(String data, String privateKey) throws Exception {
-        PKCS8EncodedKeySpec priPkcs8 = new PKCS8EncodedKeySpec(Base64.decode(privateKey));
+        PKCS8EncodedKeySpec priPkcs8 = new PKCS8EncodedKeySpec(CypherKit.decodeToBytes(privateKey));
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         PrivateKey priKey = keyFactory.generatePrivate(priPkcs8);
-        java.security.Signature signature = java.security.Signature.getInstance("SHA256WithRSA");
+        Signature signature = Signature.getInstance("SHA256WithRSA");
 
         signature.initSign(priKey);
         signature.update(data.getBytes(StandardCharsets.UTF_8));
         byte[] signed = signature.sign();
-        return StrUtil.str(Base64.encode(signed));
+        return CypherKit.encode(signed);
     }
 
     /**
@@ -208,7 +217,7 @@ public class RsaKit {
         signature.initSign(privateKey);
         signature.update(data.getBytes(StandardCharsets.UTF_8));
         byte[] signed = signature.sign();
-        return StrUtil.str(Base64.encode(signed));
+        return CypherKit.encode(signed);
     }
 
     /**
@@ -222,12 +231,12 @@ public class RsaKit {
      */
     public static boolean checkByPublicKey(String data, String sign, String publicKey) throws Exception {
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-        byte[] encodedKey = Base64.decode(publicKey);
+        byte[] encodedKey = CypherKit.encodeToBytes(publicKey);
         PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
         java.security.Signature signature = java.security.Signature.getInstance("SHA256WithRSA");
         signature.initVerify(pubKey);
         signature.update(data.getBytes(StandardCharsets.UTF_8));
-        return signature.verify(Base64.decode(sign.getBytes(StandardCharsets.UTF_8)));
+        return signature.verify(CypherKit.decodeToBytes(sign));
     }
 
     /**
@@ -243,7 +252,7 @@ public class RsaKit {
         java.security.Signature signature = java.security.Signature.getInstance("SHA256WithRSA");
         signature.initVerify(publicKey);
         signature.update(data.getBytes(StandardCharsets.UTF_8));
-        return signature.verify(Base64.decode(sign.getBytes(StandardCharsets.UTF_8)));
+        return signature.verify(CypherKit.decodeToBytes(sign));
     }
 
     /**
@@ -280,8 +289,8 @@ public class RsaKit {
      * @throws Exception 异常信息
      */
     public static String decryptByPrivateKey(String data, String privateKey, String fillMode) throws Exception {
-        byte[] encryptedData = Base64.decode(data);
-        byte[] keyBytes = Base64.decode(privateKey);
+        byte[] encryptedData = CypherKit.decodeToBytes(data);
+        byte[] keyBytes = CypherKit.decodeToBytes(privateKey);
         PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         Key key = keyFactory.generatePrivate(pkcs8KeySpec);
@@ -317,7 +326,7 @@ public class RsaKit {
      */
     public static PublicKey loadPublicKey(String publicKeyStr) throws Exception {
         try {
-            byte[] buffer = Base64.decode(publicKeyStr);
+            byte[] buffer = CypherKit.decodeToBytes(publicKeyStr);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(buffer);
             return keyFactory.generatePublic(keySpec);
@@ -340,7 +349,7 @@ public class RsaKit {
      */
     public static PrivateKey loadPrivateKey(String privateKeyStr) throws Exception {
         try {
-            byte[] buffer = Base64.decode(privateKeyStr);
+            byte[] buffer = CypherKit.decodeToBytes(privateKeyStr);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(buffer);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
             return keyFactory.generatePrivate(keySpec);
@@ -354,11 +363,11 @@ public class RsaKit {
     }
 
     public static String getPrivateKeyStr(PrivateKey privateKey) {
-        return Base64.encode(privateKey.getEncoded());
+        return CypherKit.encode(privateKey.getEncoded());
     }
 
     public static String getPublicKeyStr(PublicKey publicKey) {
-        return Base64.encode(publicKey.getEncoded());
+        return CypherKit.encode(publicKey.getEncoded());
     }
 
     public static void main(String[] args) throws Exception {

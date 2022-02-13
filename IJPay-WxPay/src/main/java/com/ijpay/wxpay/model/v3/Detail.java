@@ -1,8 +1,5 @@
 package com.ijpay.wxpay.model.v3;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.util.List;
 
 /**
@@ -18,8 +15,6 @@ import java.util.List;
  *
  * @author Javen
  */
-@Data
-@Accessors(chain = true)
 public class Detail {
     /**
      * 订单原价
@@ -33,4 +28,28 @@ public class Detail {
      * 单品列表
      */
     private List<GoodsDetail> goods_detail;
+
+	public int getCost_price() {
+		return cost_price;
+	}
+
+	public void setCost_price(int cost_price) {
+		this.cost_price = cost_price;
+	}
+
+	public String getInvoice_id() {
+		return invoice_id;
+	}
+
+	public void setInvoice_id(String invoice_id) {
+		this.invoice_id = invoice_id;
+	}
+
+	public List<GoodsDetail> getGoods_detail() {
+		return goods_detail;
+	}
+
+	public void setGoods_detail(List<GoodsDetail> goods_detail) {
+		this.goods_detail = goods_detail;
+	}
 }

@@ -1,12 +1,153 @@
 package com.ijpay.alipay;
 
-import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.alipay.api.*;
-import com.alipay.api.domain.*;
-import com.alipay.api.internal.util.StringUtils;
-import com.alipay.api.request.*;
-import com.alipay.api.response.*;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.AlipayRequest;
+import com.alipay.api.AlipayResponse;
+import com.alipay.api.BatchAlipayRequest;
+import com.alipay.api.BatchAlipayResponse;
+import com.alipay.api.domain.AlipayCommerceCityfacilitatorStationQueryModel;
+import com.alipay.api.domain.AlipayCommerceCityfacilitatorVoucherBatchqueryModel;
+import com.alipay.api.domain.AlipayCommerceCityfacilitatorVoucherGenerateModel;
+import com.alipay.api.domain.AlipayCommerceCityfacilitatorVoucherRefundModel;
+import com.alipay.api.domain.AlipayDataDataserviceBillDownloadurlQueryModel;
+import com.alipay.api.domain.AlipayFundAccountQueryModel;
+import com.alipay.api.domain.AlipayFundAuthOperationCancelModel;
+import com.alipay.api.domain.AlipayFundAuthOperationDetailQueryModel;
+import com.alipay.api.domain.AlipayFundAuthOrderFreezeModel;
+import com.alipay.api.domain.AlipayFundAuthOrderUnfreezeModel;
+import com.alipay.api.domain.AlipayFundAuthOrderVoucherCreateModel;
+import com.alipay.api.domain.AlipayFundCouponOperationQueryModel;
+import com.alipay.api.domain.AlipayFundCouponOrderAgreementPayModel;
+import com.alipay.api.domain.AlipayFundCouponOrderAppPayModel;
+import com.alipay.api.domain.AlipayFundCouponOrderDisburseModel;
+import com.alipay.api.domain.AlipayFundCouponOrderPagePayModel;
+import com.alipay.api.domain.AlipayFundCouponOrderRefundModel;
+import com.alipay.api.domain.AlipayFundTransCommonQueryModel;
+import com.alipay.api.domain.AlipayFundTransOrderQueryModel;
+import com.alipay.api.domain.AlipayFundTransToaccountTransferModel;
+import com.alipay.api.domain.AlipayFundTransUniTransferModel;
+import com.alipay.api.domain.AlipayOpenAuthTokenAppModel;
+import com.alipay.api.domain.AlipayOpenAuthTokenAppQueryModel;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.AlipayTradeCancelModel;
+import com.alipay.api.domain.AlipayTradeCloseModel;
+import com.alipay.api.domain.AlipayTradeCreateModel;
+import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
+import com.alipay.api.domain.AlipayTradeOrderSettleModel;
+import com.alipay.api.domain.AlipayTradePagePayModel;
+import com.alipay.api.domain.AlipayTradePageRefundModel;
+import com.alipay.api.domain.AlipayTradePayModel;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.domain.AlipayTradeRoyaltyRelationBatchqueryModel;
+import com.alipay.api.domain.AlipayTradeRoyaltyRelationBindModel;
+import com.alipay.api.domain.AlipayTradeRoyaltyRelationUnbindModel;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.domain.ZolozAuthenticationCustomerFacemanageCreateModel;
+import com.alipay.api.domain.ZolozAuthenticationCustomerFacemanageDeleteModel;
+import com.alipay.api.domain.ZolozAuthenticationCustomerFtokenQueryModel;
+import com.alipay.api.domain.ZolozAuthenticationCustomerSmilepayInitializeModel;
+import com.alipay.api.domain.ZolozAuthenticationSmilepayInitializeModel;
+import com.alipay.api.domain.ZolozIdentificationUserWebInitializeModel;
+import com.alipay.api.domain.ZolozIdentificationUserWebQueryModel;
+import com.alipay.api.request.AlipayCommerceAdContractSignRequest;
+import com.alipay.api.request.AlipayCommerceCityfacilitatorStationQueryRequest;
+import com.alipay.api.request.AlipayCommerceCityfacilitatorVoucherBatchqueryRequest;
+import com.alipay.api.request.AlipayCommerceCityfacilitatorVoucherGenerateRequest;
+import com.alipay.api.request.AlipayCommerceCityfacilitatorVoucherRefundRequest;
+import com.alipay.api.request.AlipayDataDataserviceBillDownloadurlQueryRequest;
+import com.alipay.api.request.AlipayEbppBillGetRequest;
+import com.alipay.api.request.AlipayFundAccountQueryRequest;
+import com.alipay.api.request.AlipayFundAuthOperationCancelRequest;
+import com.alipay.api.request.AlipayFundAuthOperationDetailQueryRequest;
+import com.alipay.api.request.AlipayFundAuthOrderFreezeRequest;
+import com.alipay.api.request.AlipayFundAuthOrderUnfreezeRequest;
+import com.alipay.api.request.AlipayFundAuthOrderVoucherCreateRequest;
+import com.alipay.api.request.AlipayFundCouponOperationQueryRequest;
+import com.alipay.api.request.AlipayFundCouponOrderAgreementPayRequest;
+import com.alipay.api.request.AlipayFundCouponOrderAppPayRequest;
+import com.alipay.api.request.AlipayFundCouponOrderDisburseRequest;
+import com.alipay.api.request.AlipayFundCouponOrderPagePayRequest;
+import com.alipay.api.request.AlipayFundCouponOrderRefundRequest;
+import com.alipay.api.request.AlipayFundTransCommonQueryRequest;
+import com.alipay.api.request.AlipayFundTransOrderQueryRequest;
+import com.alipay.api.request.AlipayFundTransToaccountTransferRequest;
+import com.alipay.api.request.AlipayFundTransUniTransferRequest;
+import com.alipay.api.request.AlipayOpenAuthTokenAppQueryRequest;
+import com.alipay.api.request.AlipayOpenAuthTokenAppRequest;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradeCancelRequest;
+import com.alipay.api.request.AlipayTradeCloseRequest;
+import com.alipay.api.request.AlipayTradeCreateRequest;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
+import com.alipay.api.request.AlipayTradeOrderSettleRequest;
+import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradePageRefundRequest;
+import com.alipay.api.request.AlipayTradePayRequest;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.request.AlipayTradeRoyaltyRelationBatchqueryRequest;
+import com.alipay.api.request.AlipayTradeRoyaltyRelationBindRequest;
+import com.alipay.api.request.AlipayTradeRoyaltyRelationUnbindRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.request.ZolozAuthenticationCustomerFacemanageCreateRequest;
+import com.alipay.api.request.ZolozAuthenticationCustomerFacemanageDeleteRequest;
+import com.alipay.api.request.ZolozAuthenticationCustomerFtokenQueryRequest;
+import com.alipay.api.request.ZolozAuthenticationCustomerSmilepayInitializeRequest;
+import com.alipay.api.request.ZolozAuthenticationSmilepayInitializeRequest;
+import com.alipay.api.request.ZolozIdentificationUserWebInitializeRequest;
+import com.alipay.api.request.ZolozIdentificationUserWebQueryRequest;
+import com.alipay.api.response.AlipayCommerceAdContractSignResponse;
+import com.alipay.api.response.AlipayCommerceCityfacilitatorStationQueryResponse;
+import com.alipay.api.response.AlipayCommerceCityfacilitatorVoucherBatchqueryResponse;
+import com.alipay.api.response.AlipayCommerceCityfacilitatorVoucherGenerateResponse;
+import com.alipay.api.response.AlipayCommerceCityfacilitatorVoucherRefundResponse;
+import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
+import com.alipay.api.response.AlipayEbppBillGetResponse;
+import com.alipay.api.response.AlipayFundAccountQueryResponse;
+import com.alipay.api.response.AlipayFundAuthOperationCancelResponse;
+import com.alipay.api.response.AlipayFundAuthOperationDetailQueryResponse;
+import com.alipay.api.response.AlipayFundAuthOrderFreezeResponse;
+import com.alipay.api.response.AlipayFundAuthOrderUnfreezeResponse;
+import com.alipay.api.response.AlipayFundAuthOrderVoucherCreateResponse;
+import com.alipay.api.response.AlipayFundCouponOperationQueryResponse;
+import com.alipay.api.response.AlipayFundCouponOrderAgreementPayResponse;
+import com.alipay.api.response.AlipayFundCouponOrderAppPayResponse;
+import com.alipay.api.response.AlipayFundCouponOrderDisburseResponse;
+import com.alipay.api.response.AlipayFundCouponOrderPagePayResponse;
+import com.alipay.api.response.AlipayFundCouponOrderRefundResponse;
+import com.alipay.api.response.AlipayFundTransCommonQueryResponse;
+import com.alipay.api.response.AlipayFundTransOrderQueryResponse;
+import com.alipay.api.response.AlipayFundTransToaccountTransferResponse;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
+import com.alipay.api.response.AlipayOpenAuthTokenAppQueryResponse;
+import com.alipay.api.response.AlipayOpenAuthTokenAppResponse;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradeCancelResponse;
+import com.alipay.api.response.AlipayTradeCloseResponse;
+import com.alipay.api.response.AlipayTradeCreateResponse;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
+import com.alipay.api.response.AlipayTradeOrderSettleResponse;
+import com.alipay.api.response.AlipayTradePageRefundResponse;
+import com.alipay.api.response.AlipayTradePayResponse;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.alipay.api.response.AlipayTradeRoyaltyRelationBatchqueryResponse;
+import com.alipay.api.response.AlipayTradeRoyaltyRelationBindResponse;
+import com.alipay.api.response.AlipayTradeRoyaltyRelationUnbindResponse;
+import com.alipay.api.response.ZolozAuthenticationCustomerFacemanageCreateResponse;
+import com.alipay.api.response.ZolozAuthenticationCustomerFacemanageDeleteResponse;
+import com.alipay.api.response.ZolozAuthenticationCustomerFtokenQueryResponse;
+import com.alipay.api.response.ZolozAuthenticationCustomerSmilepayInitializeResponse;
+import com.alipay.api.response.ZolozAuthenticationSmilepayInitializeResponse;
+import com.alipay.api.response.ZolozIdentificationUserWebInitializeResponse;
+import com.alipay.api.response.ZolozIdentificationUserWebQueryResponse;
+import com.ijpay.core.utils.PayDateUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +156,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,8 +197,8 @@ public class AliPayApi {
 			return execute(request);
 		}
 	}
-	
-	public static <T extends AlipayResponse> T doExecute(AlipayClient alipayClient,Boolean certModel,AlipayRequest<T> request) throws AlipayApiException {
+
+	public static <T extends AlipayResponse> T doExecute(AlipayClient alipayClient, Boolean certModel, AlipayRequest<T> request) throws AlipayApiException {
 		if (alipayClient == null) {
 			throw new IllegalStateException("aliPayClient 未被初始化");
 		}
@@ -68,8 +208,8 @@ public class AliPayApi {
 			return execute(alipayClient,request);
 		}
 	}
-	
-	
+
+
 	public static <T extends AlipayResponse> T doExecute(AlipayClient alipayClient,Boolean certModel,AlipayRequest<T> request,String authToken) throws AlipayApiException {
 		if (alipayClient == null) {
 			throw new IllegalStateException("aliPayClient 未被初始化");
@@ -80,7 +220,7 @@ public class AliPayApi {
 			return execute(alipayClient,request,authToken);
 		}
 	}
-	
+
 
 	public static <T extends AlipayResponse> T doExecute(AlipayRequest<T> request, String authToken) throws AlipayApiException {
 		if (AliPayApiConfigKit.getAliPayApiConfig().isCertModel()) {
@@ -89,8 +229,8 @@ public class AliPayApi {
 			return execute(request, authToken);
 		}
 	}
-	
-	
+
+
 	public static <T extends AlipayResponse> T doExecute(AlipayClient alipayClient,AlipayRequest<T> request, String authToken) throws AlipayApiException {
 		if (alipayClient == null) {
 			throw new IllegalStateException("aliPayClient 未被初始化");
@@ -105,7 +245,7 @@ public class AliPayApi {
 	public static <T extends AlipayResponse> T execute(AlipayRequest<T> request) throws AlipayApiException {
 		return AliPayApiConfigKit.getAliPayApiConfig().getAliPayClient().execute(request);
 	}
-	
+
 
 	public static <T extends AlipayResponse> T execute(AlipayClient alipayClient, AlipayRequest<T> request) throws AlipayApiException {
 		if (alipayClient == null) {
@@ -253,14 +393,14 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return sdkExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * APP支付
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
-	 *            
+	 *
 	 * @param model
 	 *            {@link AlipayTradeAppPayModel}
 	 * @param notifyUrl
@@ -296,8 +436,8 @@ public class AliPayApi {
 		request.putOtherTextParam("app_auth_token", appAuthToken);
 		return sdkExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * APP支付
 	 *
@@ -346,8 +486,8 @@ public class AliPayApi {
 		out.flush();
 		out.close();
 	}
-	
-	
+
+
 	/**
 	 * WAP支付
 	 *
@@ -403,8 +543,8 @@ public class AliPayApi {
 		out.flush();
 		out.close();
 	}
-	
-	
+
+
 	/**
 	 * WAP支付
 	 *
@@ -468,8 +608,8 @@ public class AliPayApi {
 		out.write(form.getBytes(AliPayApiConfigKit.getAliPayApiConfig().getCharset()));
 		response.getOutputStream().flush();
 	}
-	
-	
+
+
 	/**
 	 * <p>
 	 * WAP支付
@@ -536,8 +676,8 @@ public class AliPayApi {
 		out.write(form.getBytes(AliPayApiConfigKit.getAliPayApiConfig().getCharset()));
 		response.getOutputStream().flush();
 	}
-	
-	
+
+
 	/**
 	 * <p>
 	 * WAP支付
@@ -592,10 +732,10 @@ public class AliPayApi {
 		aliPayRequest.setBizModel(model);
 		return pageExecute(aliPayRequest).getBody();
 	}
-	
+
 	/**
 	 * WAP支付
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 *
@@ -640,13 +780,13 @@ public class AliPayApi {
 		aliPayRequest.putOtherTextParam("app_auth_token", appAuthToken);
 		return pageExecute(aliPayRequest).getBody();
 	}
-	
+
 	/**
 	 * WAP支付
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
-	 *            
+	 *
 	 * @param model
 	 *            {@link AlipayTradeWapPayModel}
 	 * @param returnUrl
@@ -687,7 +827,7 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易支付接口接口 <br>
 	 * 适用于:条形码支付、声波支付等 <br>
@@ -695,7 +835,7 @@ public class AliPayApi {
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式	           
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradePayModel}
 	 * @param notifyUrl
@@ -733,15 +873,15 @@ public class AliPayApi {
 		request.putOtherTextParam("app_auth_token", appAuthToken);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易支付接口接口 <br>
 	 * 适用于:条形码支付、声波支付等 <br>
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式	
+	 *				是否证书模式
 	 * @param model
 	 *            {AlipayTradePayModel}
 	 * @param notifyUrl
@@ -779,8 +919,8 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return doExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * 统一收单线下交易预创建 <br>
 	 * 适用于：扫码支付等 <br>
@@ -788,7 +928,7 @@ public class AliPayApi {
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式	            
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradePrecreateModel}
 	 * @param notifyUrl
@@ -803,8 +943,8 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return doExecute(alipayClient,certModel,request);
 	}
-	
-	
+
+
 	/**
 	 * 统一收单线下交易预创建 <br>
 	 * 适用于：扫码支付等 <br>
@@ -812,7 +952,7 @@ public class AliPayApi {
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式	            
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradePrecreateModel}
 	 * @param notifyUrl
@@ -848,14 +988,14 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单线下交易预创建 <br>
 	 * 适用于：扫码支付等 <br>
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
-	 *            
+	 *
 	 * @param model
 	 *            {@link AlipayTradePrecreateModel}
 	 * @param notifyUrl
@@ -882,51 +1022,51 @@ public class AliPayApi {
 	 * @throws AlipayApiException
 	 *             支付宝 Api 异常
 	 */
-	@Deprecated
-	public static boolean transfer(AlipayFundTransToaccountTransferModel model) throws AlipayApiException {
-		AlipayFundTransToaccountTransferResponse response = transferToResponse(model);
-		String result = response.getBody();
-		if (response.isSuccess()) {
-			return true;
-		} else {
-			// 调用查询接口查询数据
-			JSONObject jsonObject = JSONObject.parseObject(result);
-			String outBizNo = jsonObject.getJSONObject("alipay_fund_trans_toaccount_transfer_response").getString("out_biz_no");
-			AlipayFundTransOrderQueryModel queryModel = new AlipayFundTransOrderQueryModel();
-			model.setOutBizNo(outBizNo);
-			return transferQuery(queryModel);
-		}
-	}
-	
-	
+//	@Deprecated
+//	public static boolean transfer(AlipayFundTransToaccountTransferModel model) throws AlipayApiException {
+//		AlipayFundTransToaccountTransferResponse response = transferToResponse(model);
+//		String result = response.getBody();
+//		if (response.isSuccess()) {
+//			return true;
+//		} else {
+//			// 调用查询接口查询数据
+//			JSONObject jsonObject = JSONObject.parseObject(result);
+//			String outBizNo = jsonObject.getJSONObject("alipay_fund_trans_toaccount_transfer_response").getString("out_biz_no");
+//			AlipayFundTransOrderQueryModel queryModel = new AlipayFundTransOrderQueryModel();
+//			model.setOutBizNo(outBizNo);
+//			return transferQuery(queryModel);
+//		}
+//	}
+
+
 	/**
 	 * 单笔转账到支付宝账户
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式            
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayFundTransToaccountTransferModel}
 	 * @return 转账是否成功
 	 * @throws AlipayApiException
 	 *             支付宝 Api 异常
 	 */
-	@Deprecated
-	public static boolean transfer(AlipayClient alipayClient,Boolean certModel,AlipayFundTransToaccountTransferModel model) throws AlipayApiException {
-		AlipayFundTransToaccountTransferResponse response = transferToResponse(model);
-		String result = response.getBody();
-		if (response.isSuccess()) {
-			return true;
-		} else {
-			// 调用查询接口查询数据
-			JSONObject jsonObject = JSONObject.parseObject(result);
-			String outBizNo = jsonObject.getJSONObject("alipay_fund_trans_toaccount_transfer_response").getString("out_biz_no");
-			AlipayFundTransOrderQueryModel queryModel = new AlipayFundTransOrderQueryModel();
-			model.setOutBizNo(outBizNo);
-			return transferQuery(alipayClient,certModel,queryModel);
-		}
-	}
+//	@Deprecated
+//	public static boolean transfer(AlipayClient alipayClient,Boolean certModel,AlipayFundTransToaccountTransferModel model) throws AlipayApiException {
+//		AlipayFundTransToaccountTransferResponse response = transferToResponse(model);
+//		String result = response.getBody();
+//		if (response.isSuccess()) {
+//			return true;
+//		} else {
+//			// 调用查询接口查询数据
+//			JSONObject jsonObject = JSONObject.parseObject(result);
+//			String outBizNo = jsonObject.getJSONObject("alipay_fund_trans_toaccount_transfer_response").getString("out_biz_no");
+//			AlipayFundTransOrderQueryModel queryModel = new AlipayFundTransOrderQueryModel();
+//			model.setOutBizNo(outBizNo);
+//			return transferQuery(alipayClient,certModel,queryModel);
+//		}
+//	}
 
 	/**
 	 * 单笔转账到支付宝账户
@@ -942,15 +1082,15 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * 单笔转账到支付宝账户
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 *  @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayFundTransToaccountTransferModel}
 	 * @return {@link AlipayFundTransToaccountTransferResponse}
@@ -977,14 +1117,14 @@ public class AliPayApi {
 		AlipayFundTransOrderQueryResponse response = transferQueryToResponse(model);
 		return response.isSuccess();
 	}
-	
+
 	/**
 	 * 转账查询接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式            
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayFundTransOrderQueryModel}
 	 * @return 是否存在此
@@ -1011,10 +1151,10 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 转账查询接口
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
@@ -1050,14 +1190,14 @@ public class AliPayApi {
 		}
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一转账接口
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @param model
 	 *            model {@link AlipayFundTransUniTransferModel}
 	 * @param appAuthToken
@@ -1094,14 +1234,14 @@ public class AliPayApi {
 		}
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 转账业务单据查询接口
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @param model
 	 *            model {@link AlipayFundTransCommonQueryModel}
 	 * @param appAuthToken
@@ -1138,15 +1278,15 @@ public class AliPayApi {
 		}
 		return doExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * 支付宝资金账户资产查询接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @param model
 	 *            model {@link AlipayFundAccountQueryModel}
 	 * @param appAuthToken
@@ -1178,14 +1318,14 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单线下交易查询接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式 
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradeQueryModel}
 	 * @return {@link AlipayTradeQueryResponse}
@@ -1214,7 +1354,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单线下交易查询接口
 	 *
@@ -1250,7 +1390,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单交易撤销接口
 	 *
@@ -1284,14 +1424,14 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易撤销接口
-	 * 
+	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式 
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradeCancelModel}
 	 * @return {@link AlipayTradeCancelResponse}
@@ -1321,7 +1461,7 @@ public class AliPayApi {
 		return execute(request, null, appAuthToken);
 
 	}
-	
+
 	/**
 	 * 统一收单交易关闭接口
 	 *
@@ -1356,7 +1496,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易关闭接口
 	 *
@@ -1393,14 +1533,14 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易创建接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式 
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradeCreateModel}
 	 * @param notifyUrl
@@ -1435,7 +1575,7 @@ public class AliPayApi {
 		request.setNotifyUrl(notifyUrl);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单交易创建接口
 	 *
@@ -1472,14 +1612,14 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易退款接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式 
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayTradeRefundModel}
 	 * @return {@link AlipayTradeRefundResponse}
@@ -1508,7 +1648,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单交易退款接口
 	 *
@@ -1542,7 +1682,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单退款页面接口
 	 *
@@ -1579,7 +1719,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单退款页面接口
 	 *
@@ -1613,7 +1753,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易退款查询
 	 *
@@ -1668,7 +1808,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(alipayClient,request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 查询对账单下载地址
 	 *
@@ -1682,7 +1822,7 @@ public class AliPayApi {
 		AlipayDataDataserviceBillDownloadurlQueryResponse response = billDownloadUrlQueryToResponse(model);
 		return response.getBillDownloadUrl();
 	}
-	
+
 	/**
 	 * 查询对账单下载地址
 	 *
@@ -1715,7 +1855,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 查询对账单下载地址
 	 * @param alipayClient
@@ -1752,7 +1892,7 @@ public class AliPayApi {
 		request.putOtherTextParam("app_auth_token", appAuthToken);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 查询对账单下载地址
 	 *
@@ -1792,7 +1932,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return execute(request, null, appAuthToken);
 	}
-	
+
 	/**
 	 * 统一收单交易结算接口
 	 *
@@ -1826,7 +1966,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 统一收单交易结算接口
 	 *
@@ -1874,7 +2014,7 @@ public class AliPayApi {
 		out.flush();
 		out.close();
 	}
-	
+
 	/**
 	 * 电脑网站支付(PC支付)
 	 *
@@ -1939,7 +2079,7 @@ public class AliPayApi {
 		out.flush();
 		out.close();
 	}
-	
+
 	/**
 	 * 电脑网站支付(PC支付)
 	 *
@@ -2002,7 +2142,7 @@ public class AliPayApi {
 		out.write(form.getBytes(AliPayApiConfigKit.getAliPayApiConfig().getCharset()));
 		response.getOutputStream().flush();
 	}
-	
+
 	/**
 	 * 电脑网站支付(PC支付)
 	 *
@@ -2066,7 +2206,7 @@ public class AliPayApi {
 		out.write(form.getBytes(AliPayApiConfigKit.getAliPayApiConfig().getCharset()));
 		response.getOutputStream().flush();
 	}
-	
+
 	/**
 	 * 电脑网站支付(PC支付)
 	 *
@@ -2116,7 +2256,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 资金预授权冻结接口
 	 *
@@ -2151,7 +2291,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 资金授权解冻接口
 	 *
@@ -2185,7 +2325,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 资金预授权冻结接口
 	 *
@@ -2220,7 +2360,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 资金授权撤销接口
 	 *
@@ -2254,7 +2394,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 资金授权操作查询接口
 	 *
@@ -2288,7 +2428,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包无线支付接口
 	 *
@@ -2323,7 +2463,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包页面支付接口
 	 *
@@ -2358,7 +2498,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包协议支付接口
 	 *
@@ -2392,7 +2532,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包打款接口
 	 *
@@ -2426,7 +2566,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包退回接口
 	 *
@@ -2460,7 +2600,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 红包退回接口
 	 *
@@ -2510,7 +2650,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 使用 app_auth_code 换取 app_auth_token
 	 *
@@ -2545,7 +2685,7 @@ public class AliPayApi {
 		return doExecute(request);
 	}
 
-	
+
 	/**
 	 * 查询授权信息
 	 *
@@ -2579,7 +2719,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 地铁购票发码
 	 *
@@ -2614,7 +2754,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 地铁购票发码退款
 	 *
@@ -2649,7 +2789,7 @@ public class AliPayApi {
 		return doExecute(request);
 	}
 
-	
+
 	/**
 	 * 地铁车站数据查询
 	 *
@@ -2684,14 +2824,14 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 核销码批量查询
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @param model
 	 *            {@link AlipayCommerceCityfacilitatorVoucherBatchqueryModel}
 	 * @return {@link AlipayCommerceCityfacilitatorVoucherBatchqueryResponse}
@@ -2708,7 +2848,7 @@ public class AliPayApi {
 	public static void batchTrans(Map<String, String> params, String privateKey, String signType, HttpServletResponse response) throws IOException {
 		params.put("service", "batch_trans_notify");
 		params.put("_input_charset", "UTF-8");
-		params.put("pay_date", DateUtil.format(new Date(), "YYYYMMDD"));
+		params.put("pay_date", PayDateUtil.formatLocalDateTime(null, PayDateUtil.yyyyMMdd));
 		Map<String, String> param = AliPayCore.buildRequestPara(params, privateKey, signType);
 		response.sendRedirect(GATEWAY_NEW.concat(AliPayCore.createLinkString(param)));
 	}
@@ -2721,7 +2861,7 @@ public class AliPayApi {
 	 * @return 转化后的Map
 	 */
 	public static Map<String, String> toMap(HttpServletRequest request) {
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		Map<String, String[]> requestParams = request.getParameterMap();
 		for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
 			String name = iter.next();
@@ -2752,7 +2892,7 @@ public class AliPayApi {
 		request.setMerchantOrderNo(merchantOrderNo);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 生活缴费查询账单
 	 *
@@ -2789,7 +2929,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * H5刷脸认证初始化
 	 *
@@ -2823,7 +2963,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * H5刷脸认证查询
 	 *
@@ -2857,7 +2997,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 热脸入库
 	 *
@@ -2891,7 +3031,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 热脸出库
 	 *
@@ -2925,7 +3065,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 人脸 ftoken 查询消费接口
 	 *
@@ -2944,7 +3084,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(alipayClient,certModel,request);
 	}
-	
+
 
 	/**
 	 * 人脸初始化刷脸付
@@ -2960,7 +3100,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 人脸初始化刷脸付
 	 *
@@ -2994,7 +3134,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 人脸初始化唤起zim
 	 *
@@ -3025,14 +3165,14 @@ public class AliPayApi {
 		AlipayCommerceAdContractSignRequest request = new AlipayCommerceAdContractSignRequest();
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 生态激励项目ISV代签约接口
 	 *
 	 * @param alipayClient
 	 *            {@link AlipayClient}
 	 * @param certModel
-	 *				是否证书模式           
+	 *				是否证书模式
 	 * @return {@link AlipayCommerceAdContractSignResponse}
 	 * @throws AlipayApiException
 	 *             支付宝 Api 异常
@@ -3056,7 +3196,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 分账关系绑定
 	 *
@@ -3090,7 +3230,7 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
+
 	/**
 	 * 分账关系解绑
 	 *
@@ -3124,8 +3264,8 @@ public class AliPayApi {
 		request.setBizModel(model);
 		return doExecute(request);
 	}
-	
-	
+
+
 	/**
 	 * 分账关系查询
 	 *

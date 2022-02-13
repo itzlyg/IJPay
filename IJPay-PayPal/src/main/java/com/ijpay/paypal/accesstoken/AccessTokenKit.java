@@ -1,7 +1,6 @@
 
 package com.ijpay.paypal.accesstoken;
 
-import cn.hutool.core.util.StrUtil;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.utils.RetryUtils;
 import com.ijpay.paypal.PayPalApi;
@@ -9,6 +8,7 @@ import com.ijpay.paypal.PayPalApiConfig;
 import com.ijpay.paypal.PayPalApiConfigKit;
 import com.ijpay.paypal.cache.DefaultAccessTokenCache;
 import com.ijpay.paypal.cache.IAccessTokenCache;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.Callable;
 
@@ -75,7 +75,7 @@ public class AccessTokenKit {
         // 从缓存中获取 AccessToken
         if (!forceRefresh) {
             String json = accessTokenCache.get(clientId);
-            if (StrUtil.isNotEmpty(json)) {
+            if (StringUtils.isNotEmpty(json)) {
                 AccessToken accessToken = new AccessToken(json, 200);
                 if (accessToken.isAvailable()) {
                     return accessToken;

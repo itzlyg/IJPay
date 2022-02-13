@@ -1,17 +1,22 @@
 package com.ijpay.demo.controller.unionpay;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.ijpay.core.enums.SignType;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.IpKit;
 import com.ijpay.core.kit.WxPayKit;
+import com.ijpay.core.utils.PayJsonUtil;
 import com.ijpay.demo.entity.UnionPayBean;
 import com.ijpay.demo.vo.AjaxResult;
 import com.ijpay.unionpay.UnionPayApi;
 import com.ijpay.unionpay.enums.ServiceEnum;
-import com.ijpay.unionpay.model.*;
-import com.jfinal.kit.StrKit;
+import com.ijpay.unionpay.model.AuthCodeToOpenIdModel;
+import com.ijpay.unionpay.model.BillDownloadModel;
+import com.ijpay.unionpay.model.MicroPayModel;
+import com.ijpay.unionpay.model.OrderQueryModel;
+import com.ijpay.unionpay.model.RefundModel;
+import com.ijpay.unionpay.model.RefundQueryModel;
+import com.ijpay.unionpay.model.UnifiedOrderModel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,24 +64,24 @@ public class UnionPayController {
             String totalFee = request.getParameter("totalFee");
 
             String ip = IpKit.getRealIp(request);
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
+			MicroPayModel model = new MicroPayModel();
+			model.setAttach("聚合支付 SDK");
+			model.setAuth_code(authCode);
+			model.setBody("IJPay 云闪付测试");
+			model.setMch_id(unionPayBean.getMachId());
+			model.setMch_create_ip(ip);
+			model.setOut_trade_no(WxPayKit.generateStr());
 
-            Map<String, String> params = MicroPayModel.builder()
-                    .service(ServiceEnum.MICRO_PAY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付测试")
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .auth_code(authCode)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			model.setTotal_fee(totalFee);
+			model.setService(ServiceEnum.MICRO_PAY.toString());
+			model.setNonce_str(WxPayKit.generateStr());
 
-            logger.info("请求参数:" + JSONUtil.toJsonStr(params));
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
+
+            logger.info("请求参数:" + PayJsonUtil.toJson(params));
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -102,18 +107,17 @@ public class UnionPayController {
                             @RequestParam(value = "outTradeNo", required = false) String outTradeNo) {
         try {
 
-            if (StrUtil.isEmpty(transactionId) && StrUtil.isEmpty(outTradeNo)) {
+            if (StringUtils.isEmpty(transactionId) && StringUtils.isEmpty(outTradeNo)) {
                 return new AjaxResult().addError("out_trade_no transaction_id 不能同时为空");
             }
+			OrderQueryModel model = new OrderQueryModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(outTradeNo);
+			model.setService(ServiceEnum.QUERY.toString());
+			model.setTransaction_id(transactionId);
 
-            Map<String, String> params = OrderQueryModel.builder()
-                    .service(ServiceEnum.QUERY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(outTradeNo)
-                    .transaction_id(transactionId)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -132,14 +136,13 @@ public class UnionPayController {
     @ResponseBody
     public AjaxResult microPayReverse(@RequestParam("outTradeNo") String outTradeNo) {
         try {
+			OrderQueryModel model = new OrderQueryModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(outTradeNo);
+			model.setService(ServiceEnum.MICRO_PAY_REVERSE.toString());
 
-            Map<String, String> params = OrderQueryModel.builder()
-                    .service(ServiceEnum.MICRO_PAY_REVERSE.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(outTradeNo)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -159,22 +162,24 @@ public class UnionPayController {
                              @RequestParam(value = "refundFee") String refundFee) {
         try {
 
-            if (StrUtil.isEmpty(transactionId) && StrUtil.isEmpty(outTradeNo)) {
+            if (StringUtils.isEmpty(transactionId) && StringUtils.isEmpty(outTradeNo)) {
                 return new AjaxResult().addError("out_trade_no transaction_id 不能同时为空");
             }
 
-            Map<String, String> params = RefundModel.builder()
-                    .service(ServiceEnum.REFUND.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(outTradeNo)
-                    .transaction_id(transactionId)
-                    .out_refund_no(transactionId)
-                    .total_fee(totalFee)
-                    .refund_fee(refundFee)
-                    .op_user_id(unionPayBean.getMachId())
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			RefundModel model = new RefundModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(outTradeNo);
+			model.setService(ServiceEnum.REFUND.toString());
+			model.setTransaction_id(transactionId);
+
+			model.setRefund_fee(refundFee);
+			model.setTotal_fee(totalFee);
+			model.setOut_refund_no(transactionId);
+			model.setOp_user_id(unionPayBean.getMachId());
+
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -194,24 +199,25 @@ public class UnionPayController {
                                   @RequestParam(value = "refundId", required = false) String refundId) {
         try {
 
-            if (StrUtil.isEmpty(transactionId) && StrUtil.isEmpty(outTradeNo)) {
+            if (StringUtils.isEmpty(transactionId) && StringUtils.isEmpty(outTradeNo)) {
                 return new AjaxResult().addError("out_trade_no transaction_id 不能同时为空");
             }
 
-            if (StrUtil.isEmpty(outRefundNo) && StrUtil.isEmpty(refundId)) {
+            if (StringUtils.isEmpty(outRefundNo) && StringUtils.isEmpty(refundId)) {
                 return new AjaxResult().addError("out_refund_no refund_id 不能同时为空");
             }
 
-            Map<String, String> params = RefundQueryModel.builder()
-                    .service(ServiceEnum.REFUND_QUERY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(outTradeNo)
-                    .transaction_id(transactionId)
-                    .out_refund_no(outRefundNo)
-                    .refund_id(refundId)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			RefundQueryModel model = new RefundQueryModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(outTradeNo);
+			model.setService(ServiceEnum.REFUND_QUERY.toString());
+			model.setTransaction_id(transactionId);
+
+			model.setRefund_id(refundId);
+			model.setOut_refund_no(outRefundNo);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -227,14 +233,13 @@ public class UnionPayController {
     @ResponseBody
     public AjaxResult authCodeToOpenId(@RequestParam(value = "code") String code) {
         try {
+			AuthCodeToOpenIdModel model = new AuthCodeToOpenIdModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setAuth_code(code);
+			model.setService(ServiceEnum.AUTH_CODE_TO_OPENID.toString());
 
-            Map<String, String> params = AuthCodeToOpenIdModel.builder()
-                    .service(ServiceEnum.AUTH_CODE_TO_OPENID.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .auth_code(code)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -254,22 +259,22 @@ public class UnionPayController {
             String notifyUrl = unionPayBean.getDomain().concat("/unionPay/payNotify");
 
             String ip = IpKit.getRealIp(request);
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
+			UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(WxPayKit.generateStr());
+			model.setService(ServiceEnum.NATIVE.toString());
+			model.setBody("IJPay 云闪付-扫码支付");
 
-            Map<String, String> params = UnifiedOrderModel.builder()
-                    .service(ServiceEnum.NATIVE.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付-扫码支付")
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .notify_url(notifyUrl)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			model.setAttach("聚合支付 SDK");
+			model.setTotal_fee(totalFee);
+			model.setMch_create_ip(ip);
+			model.setNotify_url(notifyUrl);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -294,27 +299,25 @@ public class UnionPayController {
             if (ip.contains(",")) {
                 ip = ip.split(",")[0];
             }
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
+			UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(WxPayKit.generateStr());
+			model.setService(ServiceEnum.WEI_XIN_JS_PAY.toString());
+			model.setBody("IJPay 云闪付-微信公众号/小程序支付");
 
-            Map<String, String> params = UnifiedOrderModel.builder()
-                    .service(ServiceEnum.WEI_XIN_JS_PAY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .is_raw("1")
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付-微信公众号/小程序支付")
-                    .sub_openid(openId)
-//                    .sub_appid("appId")
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .notify_url(notifyUrl)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			model.setIs_raw("1");
+			model.setSub_openid(openId);
+			model.setAttach("聚合支付 SDK");
+			model.setTotal_fee(totalFee);
+			model.setMch_create_ip(ip);
 
-            System.out.println(params);
+			model.setNotify_url(notifyUrl);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -339,25 +342,25 @@ public class UnionPayController {
             if (ip.contains(",")) {
                 ip = ip.split(",")[0];
             }
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
 
-            Map<String, String> params = UnifiedOrderModel.builder()
-                    .service(ServiceEnum.WEI_XIN_APP_PAY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .appid(appId)
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付-微信 App 支付")
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .notify_url(notifyUrl)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(WxPayKit.generateStr());
+			model.setService(ServiceEnum.WEI_XIN_APP_PAY.toString());
+			model.setBody("IJPay 云闪付-微信 App 支付");
 
-            System.out.println(params);
+			model.setAppid(appId);
+			model.setNotify_url(notifyUrl);
+			model.setAttach("聚合支付 SDK");
+			model.setTotal_fee(totalFee);
+			model.setMch_create_ip(ip);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
+
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -385,7 +388,7 @@ public class UnionPayController {
                                @RequestParam(value = "buyerLogonId", required = false) String buyerLogonId,
                                @RequestParam(value = "buyerId", required = false) String buyerId) {
         try {
-            if (StrUtil.isEmpty(buyerLogonId) && StrUtil.isEmpty(buyerId)) {
+            if (StringUtils.isEmpty(buyerLogonId) && StringUtils.isEmpty(buyerId)) {
                 return new AjaxResult().addError("buyer_logon_id buyer_id 不能同时为空");
             }
 
@@ -395,26 +398,26 @@ public class UnionPayController {
             if (ip.contains(",")) {
                 ip = ip.split(",")[0];
             }
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
+			UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(WxPayKit.generateStr());
+			model.setService(ServiceEnum.ALI_PAY_JS_PAY.toString());
+			model.setBody("IJPay 云闪付-支付宝服务窗口");
 
-            Map<String, String> params = UnifiedOrderModel.builder()
-                    .service(ServiceEnum.ALI_PAY_JS_PAY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付-支付宝服务窗口")
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .notify_url(notifyUrl)
-                    .nonce_str(WxPayKit.generateStr())
-                    .buyer_id(buyerId)
-                    .buyer_logon_id(buyerLogonId)
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			model.setBuyer_id(buyerId);
+			model.setNotify_url(notifyUrl);
+			model.setAttach("聚合支付 SDK");
+			model.setTotal_fee(totalFee);
+			model.setMch_create_ip(ip);
 
-            System.out.println(params);
+			model.setBuyer_logon_id(buyerLogonId);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
+
 
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
@@ -466,24 +469,25 @@ public class UnionPayController {
             if (ip.contains(",")) {
                 ip = ip.split(",")[0];
             }
-            if (StrKit.isBlank(ip)) {
+            if (StringUtils.isBlank(ip)) {
                 ip = "127.0.0.1";
             }
+			UnifiedOrderModel model = new UnifiedOrderModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setOut_trade_no(WxPayKit.generateStr());
+			model.setService(ServiceEnum.UNION_JS_PAY.toString());
+			model.setBody("IJPay 云闪付-银联JS支付");
 
-            Map<String, String> params = UnifiedOrderModel.builder()
-                    .service(ServiceEnum.UNION_JS_PAY.toString())
-                    .mch_id(unionPayBean.getMachId())
-                    .out_trade_no(WxPayKit.generateStr())
-                    .body("IJPay 云闪付-银联JS支付")
-                    .user_id(userId)
-                    .customer_ip(ip)
-                    .attach("聚合支付 SDK")
-                    .total_fee(totalFee)
-                    .mch_create_ip(ip)
-                    .notify_url(notifyUrl)
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
+			model.setCustomer_ip(ip);
+			model.setNotify_url(notifyUrl);
+			model.setAttach("聚合支付 SDK");
+			model.setTotal_fee(totalFee);
+			model.setMch_create_ip(ip);
+
+			model.setUser_id(userId);
+
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             System.out.println(params);
 
@@ -502,17 +506,14 @@ public class UnionPayController {
     public AjaxResult billDownload(@RequestParam(value = "billDate", defaultValue = "20200325") String billDate,
                                    @RequestParam(value = "billType", defaultValue = "ALL") String billType) {
         try {
+			BillDownloadModel model = new BillDownloadModel();
+			model.setMch_id(unionPayBean.getMachId());
+			model.setNonce_str(WxPayKit.generateStr());
+			model.setBill_date(billDate);
+			model.setService(ServiceEnum.BILL_MERCHANT.toString());
+			model.setBill_type(billType);
 
-            Map<String, String> params = BillDownloadModel.builder()
-                    .service(ServiceEnum.BILL_MERCHANT.toString())
-                    .bill_date(billDate)
-                    .bill_type(billType)
-                    .mch_id(unionPayBean.getMachId())
-                    .nonce_str(WxPayKit.generateStr())
-                    .build()
-                    .createSign(unionPayBean.getKey(), SignType.MD5);
-
-            System.out.println(params);
+            Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
             String result = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("result:" + result);

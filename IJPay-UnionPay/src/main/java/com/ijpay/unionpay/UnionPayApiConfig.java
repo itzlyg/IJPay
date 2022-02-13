@@ -1,7 +1,6 @@
 
 package com.ijpay.unionpay;
 
-import lombok.*;
 import java.io.Serializable;
 
 /**
@@ -17,11 +16,6 @@ import java.io.Serializable;
  *
  * @author Javen
  */
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class UnionPayApiConfig implements Serializable {
     private static final long serialVersionUID = -9025648880068727445L;
 
@@ -53,4 +47,60 @@ public class UnionPayApiConfig implements Serializable {
      * 其他附加参数
      */
     private Object exParams;
+
+	public String getMchId() {
+		return mchId;
+	}
+
+	public void setMchId(String mchId) {
+		this.mchId = mchId;
+	}
+
+	public String getGroupMchId() {
+		return groupMchId;
+	}
+
+	public void setGroupMchId(String groupMchId) {
+		this.groupMchId = groupMchId;
+	}
+
+	public String getAgentMchId() {
+		return agentMchId;
+	}
+
+	public void setAgentMchId(String agentMchId) {
+		this.agentMchId = agentMchId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public String getServerUrl() {
+		return serverUrl;
+	}
+
+	public void setServerUrl(String serverUrl) {
+		this.serverUrl = serverUrl;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public Object getExParams() {
+		return exParams;
+	}
+
+	public void setExParams(Object exParams) {
+		this.exParams = exParams;
+	}
 }

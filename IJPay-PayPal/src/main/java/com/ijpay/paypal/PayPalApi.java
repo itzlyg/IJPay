@@ -194,8 +194,7 @@ public class PayPalApi {
      * @return {@link IJPayHttpResponse} 请求返回的结果
      */
     public static IJPayHttpResponse patch(String url, String data, Map<String, String> headers) {
-		// TODO
-        return null ;//HttpKit.patch(url, data, headers);
+		return HttpKit.patch(url, data, headers);
     }
 
     public static Map<String, String> getBaseHeaders(AccessToken accessToken) {

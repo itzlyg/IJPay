@@ -3,8 +3,6 @@ package com.ijpay.jdpay.util;
 import com.ijpay.core.kit.CypherKit;
 
 import javax.crypto.Cipher;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -158,52 +156,5 @@ public class RSACoder extends RsaUtil {
         keyMap.put("RSAPublicKey", publicKey);
         keyMap.put("RSAPrivateKey", privateKey);
         return keyMap;
-    }
-
-
-    public static void main(String[] args) {
-        FileOutputStream fop = null;
-
-        StringBuilder content = new StringBuilder("");
-
-
-        try {
-            for (int i = 0; i < 100; i++) {
-
-                Map<String, Object> map = initKey();
-
-
-                String pk = getPublicKey(map).replace("\r\n", "");
-                String sk = getPrivateKey(map).replace("\r\n", "");
-                content.append("publicKey:");
-                content.append(pk);
-                content.append("\n\n");
-                content.append("privateKey:");
-                content.append(sk);
-                content.append("\n\n\n");
-            }
-
-
-            File file = new File("E:/������������/������������������/key.txt");
-            fop = new FileOutputStream(file);
-
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-
-            byte[] contentInBytes = content.toString().getBytes();
-
-            fop.write(contentInBytes);
-            fop.flush();
-            fop.close();
-
-            System.out.println("Done");
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

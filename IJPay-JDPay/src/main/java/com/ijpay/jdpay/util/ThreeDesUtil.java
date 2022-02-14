@@ -188,29 +188,4 @@ public class ThreeDesUtil {
         }
         return value;
     }
-
-
-    public static void main(String[] args) {
-        String szSrc = "This is a 3DES test. 测试abcdf";
-        System.out.println("加密前的字符串:" + szSrc);
-        byte[] encoded = new byte[0];
-        try {
-            System.out.println("加密前长度:" + szSrc.getBytes("UTF-8").length);
-            System.out.println("加密前HEX:" + bytes2Hex(szSrc.getBytes("UTF-8")));
-            encoded = encrypt(DEFAULT_KEY, szSrc.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
-            System.out.println("加密后长度:" + encoded.length);
-            System.out.println("加密后的字符串:" + new String(encoded, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        byte[] srcBytes = decrypt(DEFAULT_KEY, encoded);
-
-        System.out.println("解密后HEX:" + bytes2Hex(srcBytes));
-        System.out.println("解密后的字符串:" + new String(srcBytes));
-    }
 }

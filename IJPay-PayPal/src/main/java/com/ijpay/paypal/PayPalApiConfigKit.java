@@ -78,7 +78,6 @@ public class PayPalApiConfigKit {
     public static boolean removeAllApiConfig() {
         Set<String> keySet = CFG_MAP.keySet();
         for (String str : keySet) {
-            System.out.println(str);
             CFG_MAP.remove(str);
         }
         removeThreadLocalClientId();

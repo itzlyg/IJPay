@@ -402,7 +402,6 @@ public class WxPayController extends AbstractWxPayApiController {
 
         String returnCode = result.get("return_code");
         String returnMsg = result.get("return_msg");
-        System.out.println(returnMsg);
         if (!WxPayKit.codeIsOk(returnCode)) {
             return new AjaxResult().addError("error:" + returnMsg);
         }
@@ -948,7 +947,7 @@ public class WxPayController extends AbstractWxPayApiController {
 
             Map<String, String> params = model.createSign(config.getPartnerKey(), SignType.MD5);
             String result = WxPayApi.sendRedPack(params, config.getCertPath(), config.getMchId());
-            System.out.println("发送红包结果:" + result);
+
             Map<String, String> map = WxPayKit.xmlToMap(result);
             return PayJsonUtil.toJson(map);
         } catch (Exception e) {

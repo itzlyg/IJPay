@@ -232,8 +232,6 @@ public class PayPalController {
     public String refund(@RequestParam("id") String id) {
         try {
             PayPalApiConfig config = getConfig();
-            System.out.println("id>" + id);
-
             Map<String, Object> map = new HashMap<>();
             map.put("invoice_id", PayKit.generateStr());
             map.put("note_to_payer", "test product");
@@ -296,7 +294,6 @@ public class PayPalController {
     @ResponseBody
     public String cancelUrl(HttpServletRequest request, HttpServletResponse response) {
         String readData = HttpKit.readData(request);
-        System.out.println(readData);
         return readData;
     }
 }

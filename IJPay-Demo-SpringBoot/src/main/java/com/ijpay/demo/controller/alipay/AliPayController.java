@@ -175,17 +175,11 @@ public class AliPayController extends AbstractAliPayApiController {
             paramsMap.put("biz_content", PayJsonUtil.toJson(bizMap));
 
             String content = PayKit.createLinkString(paramsMap);
-
-            System.out.println(content);
-
             String encrypt = RsaKit.encryptByPrivateKey(content, aliPayApiConfig.getPrivateKey());
-            System.out.println(encrypt);
 //            encrypt = AlipaySignature.rsaSign(content,aliPayApiConfig.getPrivateKey(), "UTF-8","RSA2");
-//            System.out.println(encrypt);
             paramsMap.put("sign", encrypt);
 
             String url = aliPayApiConfig.getServiceUrl() + "?" + PayKit.createLinkString(paramsMap, true);
-            System.out.println(url);
             response.sendRedirect(url);
 
         } catch (Exception e) {
@@ -209,7 +203,6 @@ public class AliPayController extends AbstractAliPayApiController {
         model.setTotalAmount(totalAmount);
         model.setPassbackParams(passBackParams);
         String outTradeNo = StringUtils.getOutTradeNo();
-        System.out.println("wap outTradeNo>" + outTradeNo);
         model.setOutTradeNo(outTradeNo);
         model.setProductCode("QUICK_WAP_PAY");
 
@@ -659,8 +652,6 @@ public class AliPayController extends AbstractAliPayApiController {
     @ResponseBody
     public String redirectUri(@RequestParam("app_id") String appId, @RequestParam("app_auth_code") String appAuthCode) {
         try {
-            System.out.println("app_id:" + appId);
-            System.out.println("app_auth_code:" + appAuthCode);
             //使用app_auth_code换取app_auth_token
             AlipayOpenAuthTokenAppModel model = new AlipayOpenAuthTokenAppModel();
             model.setGrantType("authorization_code");
@@ -747,20 +738,12 @@ public class AliPayController extends AbstractAliPayApiController {
         try {
             // 获取支付宝GET过来反馈信息
             Map<String, String> map = AliPayApi.toMap(request);
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            }
-
             boolean verifyResult = AlipaySignature.rsaCheckV1(map, aliPayBean.getPublicKey(), "UTF-8",
                     "RSA2");
-
             if (verifyResult) {
                 // TODO 请在这里加上商户的业务逻辑程序代码
-                System.out.println("return_url 验证成功");
-
                 return "success";
             } else {
-                System.out.println("return_url 验证失败");
                 // TODO
                 return "failure";
             }
@@ -776,20 +759,15 @@ public class AliPayController extends AbstractAliPayApiController {
         try {
             // 获取支付宝GET过来反馈信息
             Map<String, String> map = AliPayApi.toMap(request);
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            }
 
             boolean verifyResult = AlipaySignature.rsaCertCheckV1(map, aliPayBean.getAliPayCertPath(), "UTF-8",
                     "RSA2");
 
             if (verifyResult) {
                 // TODO 请在这里加上商户的业务逻辑程序代码
-                System.out.println("certReturnUrl 验证成功");
 
                 return "success";
             } else {
-                System.out.println("certReturnUrl 验证失败");
                 // TODO
                 return "failure";
             }
@@ -807,18 +785,13 @@ public class AliPayController extends AbstractAliPayApiController {
             // 获取支付宝POST过来反馈信息
             Map<String, String> params = AliPayApi.toMap(request);
 
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            }
-
             boolean verifyResult = AlipaySignature.rsaCheckV1(params, aliPayBean.getPublicKey(), "UTF-8", "RSA2");
 
             if (verifyResult) {
                 // TODO 请在这里加上商户的业务逻辑程序代码 异步通知可能出现订单重复通知 需要做去重处理
-                System.out.println("notify_url 验证成功succcess");
+
                 return "success";
             } else {
-                System.out.println("notify_url 验证失败");
                 // TODO
                 return "failure";
             }
@@ -835,18 +808,12 @@ public class AliPayController extends AbstractAliPayApiController {
             // 获取支付宝POST过来反馈信息
             Map<String, String> params = AliPayApi.toMap(request);
 
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                System.out.println(entry.getKey() + " = " + entry.getValue());
-            }
-
             boolean verifyResult = AlipaySignature.rsaCertCheckV1(params, aliPayBean.getAliPayCertPath(), "UTF-8", "RSA2");
 
             if (verifyResult) {
                 // TODO 请在这里加上商户的业务逻辑程序代码 异步通知可能出现订单重复通知 需要做去重处理
-                System.out.println("certNotifyUrl 验证成功succcess");
                 return "success";
             } else {
-                System.out.println("certNotifyUrl 验证失败");
                 // TODO
                 return "failure";
             }

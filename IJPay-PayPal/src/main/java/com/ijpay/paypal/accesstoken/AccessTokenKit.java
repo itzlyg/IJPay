@@ -10,8 +10,6 @@ import com.ijpay.paypal.cache.DefaultAccessTokenCache;
 import com.ijpay.paypal.cache.IAccessTokenCache;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.concurrent.Callable;
-
 /**
  * <p>IJPay 让支付触手可及，封装了微信支付、支付宝支付、银联支付常用的支付方式以及各种常用的接口。</p>
  *
@@ -85,13 +83,10 @@ public class AccessTokenKit {
 
         PayPalApiConfig apiConfig = PayPalApiConfigKit.getApiConfig(clientId);
 
-        AccessToken result = RetryUtils.retryOnException(3, new Callable<AccessToken>() {
-            @Override
-            public AccessToken call() {
-                IJPayHttpResponse response = PayPalApi.getToken(apiConfig);
-                return new AccessToken(response.getBody(), response.getStatus());
-            }
-        });
+        AccessToken result = RetryUtils.retryOnException(3, () -> {
+			IJPayHttpResponse response = PayPalApi.getToken(apiConfig);
+			return new AccessToken(response.getBody(), response.getStatus());
+		});
 
         // 三次请求如果仍然返回了不可用的 AccessToken 仍然 put 进去，便于上层通过 AccessToken 中的属性判断底层的情况
         if (null != result) {

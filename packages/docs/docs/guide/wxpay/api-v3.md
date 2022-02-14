@@ -94,14 +94,8 @@ public void v3Get() {
         String serialNumber = MapUtil.getStr(result, "serialNumber");
         String body = MapUtil.getStr(result, "body");
         int status = MapUtil.getInt(result, "status");
-
-        System.out.println("serialNumber:" + serialNumber);
-        System.out.println("status:" + status);
         // 根据证书序列号查询对应的证书来验证签名结果
         boolean verifySignature = WxPayKit.verifySignature(result, platformCertPath);
-
-        System.out.println("verifySignature:" + verifySignature + "\nbody:" + body);
-
     } catch (Exception e) {
         e.printStackTrace();
     }
@@ -153,7 +147,6 @@ public String sensitive() {
                 wxPayV3Bean.getKeyPath(),
                 body
         );
-        System.out.println(result);
         return JSONUtil.toJsonStr(result);
     } catch (Exception e) {
         e.printStackTrace();
@@ -196,13 +189,13 @@ String publicKey = aesUtil.decryptToString(
         nonce.getBytes(StandardCharsets.UTF_8),
         ciphertext
 );
-System.out.println("平台证书公钥明文：" + publicKey);
+
 // 保存证书
 FileWriter writer = new FileWriter(saveCertPath);
 writer.write(publicKey);
 // 获取平台证书序列号
 X509Certificate certificate = PayKit.getCertificate(new ByteArrayInputStream(publicKey.getBytes()));
-System.out.println(certificate.getSerialNumber().toString(16).toUpperCase());
+
 ```       
 
 ## 敏感信息加解密
@@ -211,12 +204,12 @@ System.out.println(certificate.getSerialNumber().toString(16).toUpperCase());
  // 敏感信息加密
 X509Certificate certificate = PayKit.getCertificate(FileUtil.getInputStream(wxPayV3Bean.getPlatformCertPath()));
 String encrypt = PayKit.rsaEncryptOAEP("IJPay", certificate);
-System.out.println(encrypt);
+
 // 敏感信息解密
 String encryptStr = "";
 PrivateKey privateKey = PayKit.getPrivateKey(wxPayV3Bean.getKeyPath());
 String decrypt = PayKit.rsaDecryptOAEP(encryptStr, privateKey);
-System.out.println(decrypt);
+
 ```
 
 <Q url="tencent://message/?uin=572839485&Site=%E5%AE%A2%E6%9C%8D&Menu=yes" />

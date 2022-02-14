@@ -10,7 +10,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -663,14 +662,9 @@ public class WxPayKit {
 				String cipherText = resource.get("ciphertext");
 				String nonceStr = resource.get("nonce");
 				String associatedData = resource.get("associated_data");
-
-				AesUtil aesUtil = new AesUtil(key.getBytes(StandardCharsets.UTF_8));
 				// 密文解密
-				return aesUtil.decryptToString(
-					associatedData.getBytes(StandardCharsets.UTF_8),
-					nonceStr.getBytes(StandardCharsets.UTF_8),
-					cipherText
-				);
+				return CypherKit.decryptToCipher(key, associatedData, nonceStr, cipherText);
+
 			} else {
 				throw new Exception("签名错误");
 			}

@@ -24,17 +24,17 @@ public final class StringUtils extends org.apache.commons.lang3.StringUtils {
 		}
 		return encode;
 	}
-	
+
 	/**
 	 * 获取UUID，去掉`-`的
 	 * @return {String}
-	 * 
+	 *
 	 */
 	public static String generateStr () {
 		return UUID.randomUUID().toString().replace("-", "");
 	}
 
-	
+
 	/**
 	 * 要求外部订单号必须唯一。
 	 * @return {String}
@@ -50,19 +50,19 @@ public final class StringUtils extends org.apache.commons.lang3.StringUtils {
 
 	/**
 	 * 字符串格式化
-	 * 
+	 *
 	 * use: format("my name is {0}, and i like {1}!", "L.cm", "java")
-	 * 
+	 *
 	 * int long use {0,number,#}
-	 * 
-	 * @param s 
+	 *
+	 * @param s
 	 * @param args
 	 * @return {String}转换后的字符串
 	 */
 	public static String format(String s, Object... args) {
 		return MessageFormat.format(s, args);
 	}
-	
+
 	/**
 	 * 替换某个字符
 	 * @param str
@@ -137,9 +137,5 @@ public final class StringUtils extends org.apache.commons.lang3.StringUtils {
 			}
 		}
 		return new String(buffer);
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(random(32, RandomType.ALL));
 	}
 }

@@ -6,8 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author xyb
@@ -19,6 +25,10 @@ public class CypherKit {
 	private static final String HMACSHA256 = "HmacSHA256";
 
 	private static final String KEY_AES = "AES";
+
+	private static final int KEY_LENGTH_BYTE = 32;
+
+	private static final int TAG_LENGTH_BIT = 128;
 
 	public static byte[] encodeToBytes(String input){
 		return Base64.encodeBase64(input.getBytes(StandardCharsets.UTF_8));
@@ -96,6 +106,39 @@ public class CypherKit {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * 证书和回调报文解密
+	 * @param cky cky
+	 * @param associatedData associated_data
+	 * @param nonce          nonce
+	 * @param cipherText     ciphertext
+	 * @return {String} 平台证书明文
+	 * @throws GeneralSecurityException 异常
+	 */
+	public static String decryptToCipher(String cky, String associatedData, String nonce, String cipherText) throws GeneralSecurityException {
+		if (StringUtils.isAnyBlank(cky)) {
+			throw new IllegalArgumentException("参数不能为空");
+		}
+		byte[] keys = cky.getBytes(StandardCharsets.UTF_8);
+		if (keys.length != KEY_LENGTH_BYTE) {
+			throw new IllegalArgumentException("无效的ApiV3Key，长度必须为32个字节");
+		}
+		byte[] nonces = nonce.getBytes(StandardCharsets.UTF_8);
+		byte[] associatedDatas = associatedData.getBytes(StandardCharsets.UTF_8);
+		try {
+			Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+			SecretKeySpec key = new SecretKeySpec(keys, KEY_AES);
+			GCMParameterSpec spec = new GCMParameterSpec(TAG_LENGTH_BIT, nonces);
+			cipher.init(Cipher.DECRYPT_MODE, key, spec);
+			cipher.updateAAD(associatedDatas);
+			return new String(cipher.doFinal(CypherKit.encodeToBytes(cipherText)), StandardCharsets.UTF_8);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			throw new IllegalStateException(e);
+		} catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	/**

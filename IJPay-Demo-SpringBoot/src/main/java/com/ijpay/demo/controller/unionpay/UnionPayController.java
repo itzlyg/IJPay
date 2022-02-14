@@ -489,8 +489,6 @@ public class UnionPayController {
 
             Map<String, String> params = model.createSign(unionPayBean.getKey(), SignType.MD5);
 
-            System.out.println(params);
-
             String xmlResult = UnionPayApi.execution(unionPayBean.getServerUrl(), params);
             logger.info("xmlResult:" + xmlResult);
             Map<String, String> result = WxPayKit.xmlToMap(xmlResult);

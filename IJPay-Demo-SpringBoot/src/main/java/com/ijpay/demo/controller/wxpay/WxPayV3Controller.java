@@ -3,7 +3,7 @@ package com.ijpay.demo.controller.wxpay;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ijpay.core.IJPayHttpResponse;
 import com.ijpay.core.enums.RequestMethod;
-import com.ijpay.core.kit.AesUtil;
+import com.ijpay.core.kit.CypherKit;
 import com.ijpay.core.kit.HttpKit;
 import com.ijpay.core.kit.PayKit;
 import com.ijpay.core.kit.WxPayKit;
@@ -99,19 +99,7 @@ public class WxPayV3Controller {
             // 获取证书序列号
             X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getCertPath()));
             serialNo = certificate.getSerialNumber().toString(16).toUpperCase();
-
-//            System.out.println("输出证书信息:\n" + certificate.toString());
-//            // 输出关键信息，截取部分并进行标记
-//            System.out.println("证书序列号:" + certificate.getSerialNumber().toString(16));
-//            System.out.println("版本号:" + certificate.getVersion());
-//            System.out.println("签发者：" + certificate.getIssuerDN());
-//            System.out.println("有效起始日期：" + certificate.getNotBefore());
-//            System.out.println("有效终止日期：" + certificate.getNotAfter());
-//            System.out.println("主体名：" + certificate.getSubjectDN());
-//            System.out.println("签名算法：" + certificate.getSigAlgName());
-//            System.out.println("签名：" + certificate.getSignature().toString());
         }
-        System.out.println("serialNo:" + serialNo);
         return serialNo;
     }
 
@@ -131,20 +119,14 @@ public class WxPayV3Controller {
             X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getPlatformCertPath()));
             platSerialNo = certificate.getSerialNumber().toString(16).toUpperCase();
         }
-        System.out.println("platSerialNo:" + platSerialNo);
         return platSerialNo;
     }
 
     private String savePlatformCert(String associatedData, String nonce, String cipherText, String certPath) {
         try {
-            AesUtil aesUtil = new AesUtil(wxPayV3Bean.getApiKey3().getBytes(StandardCharsets.UTF_8));
             // 平台证书密文解密
             // encrypt_certificate 中的  associated_data nonce  ciphertext
-            String publicKey = aesUtil.decryptToString(
-                    associatedData.getBytes(StandardCharsets.UTF_8),
-                    nonce.getBytes(StandardCharsets.UTF_8),
-                    cipherText
-            );
+            String publicKey = CypherKit.decryptToCipher(wxPayV3Bean.getApiKey3(), associatedData, nonce, cipherText);
             // 保存证书
 			FileUtils.write(new File(certPath), publicKey, Charset.defaultCharset());
             // 获取平台证书序列号
@@ -212,7 +194,7 @@ public class WxPayV3Controller {
             }
             // 根据证书序列号查询对应的证书来验证签名结果
             boolean verifySignature = WxPayKit.verifySignature(response, wxPayV3Bean.getPlatformCertPath());
-            System.out.println("verifySignature:" + verifySignature);
+
             return body;
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,7 +361,6 @@ public class WxPayV3Controller {
                     wxPayV3Bean.getKeyPath(),
 				PayJsonUtil.toJson(hashMap)
             );
-            System.out.println(result);
 
             result = WxPayApi.v3(
                     RequestMethod.DELETE,
@@ -393,7 +374,7 @@ public class WxPayV3Controller {
             );
             // 根据证书序列号查询对应的证书来验证签名结果
             boolean verifySignature = WxPayKit.verifySignature(result, wxPayV3Bean.getPlatformCertPath());
-            System.out.println("verifySignature:" + verifySignature);
+
             // 如果返回的为 204 表示删除成功
             return PayJsonUtil.toJson(result);
         } catch (Exception e) {
@@ -409,7 +390,7 @@ public class WxPayV3Controller {
         // 支付有礼-终止活动
         try {
             String urlSuffix = String.format(WxApiType.PAY_GIFT_ACTIVITY_TERMINATE.toString(), "10028001");
-            System.out.println(urlSuffix);
+
             IJPayHttpResponse result = WxPayApi.v3(
                     RequestMethod.POST,
                     WxDomain.CHINA.toString(),
@@ -444,7 +425,6 @@ public class WxPayV3Controller {
                     wxPayV3Bean.getKeyPath(),
                     body
             );
-            System.out.println(result);
             return PayJsonUtil.toJson(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -459,12 +439,12 @@ public class WxPayV3Controller {
             // 敏感信息加密
             X509Certificate certificate = PayKit.getCertificate(openInputStream(wxPayV3Bean.getPlatformCertPath()));
             String encrypt = PayKit.rsaEncryptOAEP("IJPay", certificate);
-            System.out.println(encrypt);
+
             // 敏感信息解密
             String encryptStr = "";
             PrivateKey privateKey = PayKit.getPrivateKey(wxPayV3Bean.getKeyPath());
             String decrypt = PayKit.rsaDecryptOAEP(encryptStr, privateKey);
-            System.out.println(decrypt);
+
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
